@@ -6,6 +6,8 @@ from libs.orderapi import Orderapi
 from setoptions import set_options
 from truths import getTruthsOf
 import time
+from zoneinfo import ZoneInfo
+
 
 logging.basicConfig(filename="logs/place_orders.log", level=logging.DEBUG)
 ps1 = get_ps_1()
@@ -13,10 +15,13 @@ orderapi = Orderapi()
 
 
 def place_orders():
+    if(getConfig('HOLD_EXE')):
+        print('Trade execution on hold by remote')
+        return
     # market window
-    if(not (datetime.time(hour=9, minute=20) < datetime.datetime.now().time() < datetime.time(hour=15, minute=5))):
+    if(not (datetime.time(hour=9, minute=20) < datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).time() < datetime.time(hour=15, minute=5))):
         print('Outside market time window')
-        logging('Outside market time window')
+        logging.info('Outside market time window')
         return
     if(not getTruthsOf('BANKNIFTY')):
         return
@@ -24,10 +29,16 @@ def place_orders():
         return
     # place intraday orders
     set_options()
-    ce = getConfig(f'NIFTYBANK_CE')[0]
-    orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
-    pe = getConfig(f'NIFTYBANK_PE')[0]
-    orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
+    time.sleep(2)
+    try:
+        ce = getConfig(f'NIFTYBANK_CE')[0]
+        orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
+        pe = getConfig(f'NIFTYBANK_PE')[0]
+        time.sleep(2)
+        orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
+    except Exception as ex:
+        print('Error placing orders')
+        print(ex.__str__())
 
 
 if(__name__ == '__main__'):

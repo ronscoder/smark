@@ -3,7 +3,7 @@ from libs.pubsub import get_ps_1
 p1 = get_ps_1()
 
 
-def setDefault():
+def setParams():
     params = {'GENERAL': {'TIME': True}, 'BANKNIFTY': {'ON': True}}
     p1.hsetmap('PARAMS', params)
 
@@ -13,4 +13,4 @@ def getTruthsOf(key='GENERAL'):
     return all(truths)
 
 if(__name__ == '__main__'):
-    setDefault()
+    setParams()

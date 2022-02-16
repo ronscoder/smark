@@ -23,26 +23,29 @@ def set_options():
     # print(atm)
     yy = '22'
     'next thursdays'
-    dds = getConfig('THURSDAYS')
-    m = datetime.datetime.now().month
+    # dds = getConfig('THURSDAYS')
+    mds = getConfig('OPTION_MD')
+    d = datetime.datetime.now()
+    # ms = [d.month, d.month+1] #not allow
+    # ms = [d.month]
+    b = datetime.datetime.strftime(d, "%b").upper()
     # # print(month)
     ce_strike_from = atm + getConfig('STRIKE_MID_SKIP')
     ce_strike_upto = ce_strike_from + getConfig('STRIKE_LIMIT')
     print('CE strike range', ce_strike_from, ce_strike_upto)
-    ces = [f'BANKNIFTY{yy}{m}{dd}{strike}CE' for strike in range(ce_strike_from, ce_strike_upto, 100) for dd in dds]
-    ce_strike_from = atm + getConfig('STRIKE_MID_SKIP')
-    ce_strike_upto = ce_strike_from + getConfig('STRIKE_LIMIT')
-    ces = [f'BANKNIFTY{yy}{m}{dd}{strike}CE' for strike in range(ce_strike_from, ce_strike_upto, 100) for dd in dds]
+    ces = [f'BANKNIFTY{yy}{md[0]}{md[1]}{strike}CE' for strike in range(ce_strike_from, ce_strike_upto, 100) for md in mds] + [f'BANKNIFTY{yy}{b}{strike}CE' for strike in range(ce_strike_from, ce_strike_upto, 100)]
+    # print(ces)
 
     pe_strike_from = atm - getConfig('STRIKE_MID_SKIP') - getConfig('STRIKE_LIMIT')
     pe_strike_upto = pe_strike_from + getConfig('STRIKE_LIMIT')
     print('PE strike range', pe_strike_from, pe_strike_upto)
-    pes = [f'BANKNIFTY{yy}{m}{dd}{strike}PE' for strike in range(pe_strike_from, pe_strike_upto, 100) for dd in dds]
-
+    pes = [f'BANKNIFTY{yy}{md[0]}{md[1]}{strike}PE' for strike in range(pe_strike_from, pe_strike_upto, 100) for md in mds] + [f'BANKNIFTY{yy}{b}{strike}PE' for strike in range(pe_strike_from, pe_strike_upto, 100)]
+    # print(pes)
+    # pdb.set_trace()
     ltps = kite.ltp([f'NFO:{inst}' for inst in [*ces, *pes]])
     # print('rate', rate)
-    # for ltp in ltps:
-    #     print(ltp, ltps[ltp]['last_price'])
+    for ltp in ltps:
+        print(ltp, ltps[ltp]['last_price'])
     # print(ltps)
     print()
     celtps = [(x, ltps[x]) for x in ltps if x[-2:] == 'CE']

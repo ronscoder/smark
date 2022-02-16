@@ -1,1 +1,1 @@
-python3 test1.py & python test2.py
+python3 setdefaults.py & python3 connection.py & python3 trailsl.py & python3 order_updates.py & python3 place_orders.py
