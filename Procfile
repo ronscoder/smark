@@ -1,1 +1,1 @@
-worker: python testpy.py
+worker: ./cmd.sh
