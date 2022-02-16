@@ -4,15 +4,15 @@ import os
 
 def get_ps_1():
     'For dynamic/runtime data'
-    return PubSub(db=1)
+    return PubSub()
 
 def get_ps_2():
     'For persisting data'
-    return PubSub(db=2)
+    return PubSub()
 
 def get_ps_3():
     'For meta data'
-    return PubSub(db=3)
+    return PubSub()
 
 class PubSub:
     def __init__(self, db=0) -> None:
