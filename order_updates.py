@@ -99,12 +99,7 @@ def handle_order_update(channel, data):
         if(status == 'OPEN'):
             pass
             
-
-
-        
-
-
-
-
+            
 if(__name__ == '__main__'):
+    print('running order updates...')
     ps1.subscribe(channels, handle_order_update)

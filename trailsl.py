@@ -32,5 +32,7 @@ def action(channel, data):
             p1.set('CURRENT_BUY_ORDER', position)
         except:
             pass
-    
-p1.subscribe(['TICK_*'], cb=action)
+
+if(__name__=='__main__'):
+    print('running trail SL...')
+    p1.subscribe(['TICK_*'], cb=action)
