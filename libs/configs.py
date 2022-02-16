@@ -28,22 +28,22 @@ def getConfig(varname):
 
 def delConfig(varname):
     rconfig.r.hdel('configs', varname)
-    rconfig.r.save()
+    # rconfig.r.save()
 
 
 def setConfig(varname, val):
     rconfig.hsetmap('configs', {varname: val})
-    rconfig.r.save()
+    # rconfig.r.save()
 
 
 def setConfigs(data):
     rconfig.hsetmap('configs', data)
-    rconfig.r.save()
+    # rconfig.r.save()
 
 
 def setInitial():
     rconfig.hsetmap('configs', CONFIGS)
-    rconfig.r.save()
+    # rconfig.r.save()
 
 
 def _getConfig(varname):

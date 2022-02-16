@@ -1,11 +1,11 @@
 from kiteconnect import KiteConnect, KiteTicker
 import datetime
 from libs.configs import getConfig
-from libs.access import run_access
+# from access import run_access
 
 
 def getKite():
-        run_access()
+        # run_access()
         access_token = getConfig('ACCESS_TOKEN')
         if(access_token is None):
             raise Exception('Acess token not set')
