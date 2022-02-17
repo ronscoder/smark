@@ -9,7 +9,7 @@ orderapi = Orderapi()
 
 def action(channel, data):
     position = p1.get('CURRENT_BUY_ORDER')
-    print('position', position)
+    print('trail SL check. position', position)
     if(position == None):
         return
 
