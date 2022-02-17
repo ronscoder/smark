@@ -9,7 +9,7 @@ orderapi = Orderapi()
 
 def action(channel, data):
     position = p1.get('CURRENT_BUY_ORDER')
-    print('trail SL check. position', position)
+    
     if(position == None):
         return
 
@@ -17,7 +17,7 @@ def action(channel, data):
     instrument_token = position['instrument_token']
     if(not channel == f'TICK_{instrument_token}'):
         return
-
+    print('trail SL check. position', position)
     ltp = data['last_price']
     price_bought = position['price']
     stoploss = position['COUNTER_SL_ORDER']['price']
