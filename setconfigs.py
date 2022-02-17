@@ -8,7 +8,7 @@ CONFIGS = {
     'STOP_PC': 0.08,
     'TRIGGER_GAP': 1.0,
     'NIFTYBANK_QTY': 25,
-    'HOLD_EXE': True,
+    'HOLD_EXE': False,
     'OPTION_PRICE_RANGE': (50, 90),
     'STRIKE_MID_SKIP': 1000,
     'STRIKE_LIMIT': 1000,
