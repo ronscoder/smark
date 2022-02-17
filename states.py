@@ -9,7 +9,7 @@ while True:
     print('CONFIGS')
     confs = getConfigs()
     for k in confs:
-        print(k, confs[k])
+        print(f'{k}={confs[k]}')
 
     print()
     print('CURRENT_BUY_ORDER')
