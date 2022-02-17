@@ -21,9 +21,14 @@ def action(channel, data):
     price_bought = position['price']
     stoploss = position['COUNTER_SL_ORDER']['price']
     base_price = price_bought if price_bought > stoploss else stoploss
-    newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
+    increment = math.floor(base_price * getConfig('TRAIL_PC'))
+    newstoploss = base_price + increment
+    # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('base price', base_price, 'new stoploss',newstoploss, 'ltp', ltp)
     if(ltp > (newstoploss + ltp*getConfig('TRAIL_BUFFER_PC'))):
+        unit_pl = ltp - base_price
+        factor = unit_pl//increment
+        newstoploss = base_price + increment * factor
         print(f'set new stoploss from {base_price} -> {newstoploss}', tradingsymbol)
         try:
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=newstoploss, trigger=newstoploss)
