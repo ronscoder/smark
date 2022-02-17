@@ -15,6 +15,7 @@ orderapi = Orderapi()
 
 
 def place_orders():
+    
     if(getConfig('HOLD_EXE')):
         print('Trade execution on hold by remote')
         return
@@ -45,6 +46,7 @@ if(__name__ == '__main__'):
     cancel_open_order_counter = 0
     while True:
         'Change price and trigger for open buy orders'
+        print('PLACE ORDERS checking...')
         oorders = orderapi.get_open_orders()
         obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
         for order in obuyorders:
