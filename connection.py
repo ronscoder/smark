@@ -21,7 +21,7 @@ def connect():
 
     def on_ticks(ws, ticks):
         for tick in ticks:
-            print('tick', tick['instrument_token'])
+            #print('tick', tick['instrument_token'])
             r.publish(f'TICK_{tick["instrument_token"]}', tick)
 
     def on_error(ws, code, reason):
