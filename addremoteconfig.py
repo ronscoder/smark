@@ -28,4 +28,4 @@ OPEN_ORDER_EXPIRY_MIN=7,
 db = firestore.client()
 configs_ref = db.collection(u'configs').document(u'VIp4hCZGXPOqyJMNDc6H')
 
-configs_ref.set(configs)
+configs_ref.update(configs)

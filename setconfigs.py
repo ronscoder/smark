@@ -13,7 +13,7 @@ CONFIGS = {
     'STRIKE_MID_SKIP': 1000,
     'STRIKE_LIMIT': 1000,
     'DURATION_OPEN_POSITION_MIN': 120.0,
-    'OPTION_MD': [('3','03'), ('3','10')],
+    'OPTION_MD': ['303', '310'],
     'OPEN_ORDER_EXPIRY_MIN': 7
 }
 

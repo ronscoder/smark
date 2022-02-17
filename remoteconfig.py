@@ -41,7 +41,7 @@ configs_ref.on_snapshot(on_snapshot)
 
 while True:
     print('remote config listening...')
-    time.sleep(10)
+    time.sleep(60)
 
 # if(__name__=='__main__'):
 #     configs = getRemoteConfigs()
