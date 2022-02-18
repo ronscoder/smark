@@ -20,7 +20,7 @@ def place_orders():
         print('Trade execution on hold by remote')
         return
     # market window
-    if(not (datetime.time(hour=9, minute=20) < datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).time() < datetime.time(hour=15, minute=5))):
+    if(not (datetime.time(hour=9, minute=15) < datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).time() < datetime.time(hour=15, minute=0))):
         print('Outside market time window')
         logging.info('Outside market time window')
         return
@@ -29,6 +29,7 @@ def place_orders():
     if(not getTruthsOf('GENERAL')):
         return
     # place intraday orders
+    # return
     set_options()
     time.sleep(2)
     try:
