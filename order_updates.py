@@ -62,7 +62,7 @@ def handle_order_update(channel, data):
             pass
 
         if(status == KC.STATUS_COMPLETE):
-            ps1.publish('SMARKMSG', f'bought {tradingsymbol} @ {price}')
+            # ps1.publish('SMARKMSG', f'bought {tradingsymbol} @ {price}')
             ps1.set('CURRENT_BUY_ORDER', data)
             orderApi.place_sl_sell_order(data)
             time.sleep(2)

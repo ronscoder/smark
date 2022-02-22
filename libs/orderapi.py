@@ -64,17 +64,20 @@ class Orderapi:
 
     def place_sl_sell_order(self, orderdata):
         print('place SL sell order', orderdata['tradingsymbol'])
-        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'])
+        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'], orderdata['price'])
         params = {'variety': orderdata['variety'], "exchange": orderdata['exchange'], "tradingsymbol": orderdata['tradingsymbol'], "transaction_type": self.kite.TRANSACTION_TYPE_SELL,
                   "quantity": orderdata['quantity'], "order_type": self.kite.ORDER_TYPE_SL, "product": orderdata['product'], "price": price, 'trigger_price': stoploss_trigger}
         print('trigger', stoploss_trigger, 'price', price)
         order_id = self.kite.place_order(**params)
 
 
-    def get_sell_sl_prices(self, tradingsymbol):
+    def get_sell_sl_prices(self, tradingsymbol, price_bought=0):
         kite = self.kite
         symb = f'NFO:{tradingsymbol}'
-        last_price = kite.ltp(symb)[symb]['last_price']
+        if(price_bought == 0):
+            last_price = kite.ltp(symb)[symb]['last_price']
+        else:
+            last_price = price_bought
         price = round((1 - float(getConfig('STOP_PC')))*last_price, 1)
         trigger = price + getConfig('TRIGGER_GAP')
         return (price, trigger)
