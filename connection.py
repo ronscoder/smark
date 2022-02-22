@@ -1,6 +1,8 @@
 from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 import threading
+from order_updates import handle_order_update
+from on_tick import on_tick
 # from multiprocessing import process
 'This is connection point to main server. and meant to run without interruptions and any complex calculations'
 r = get_ps_1()
@@ -13,36 +15,36 @@ def connect():
         print('[CONNECTED]')
         kws.subscribe(index_tokens)
         kws.set_mode(kws.MODE_FULL, index_tokens)
-        r.publish('STATUS', 'CONNECTED')
+        # r.publish('STATUS', 'CONNECTED')
 
     def on_close(ws, code, reason):
         print('[CLOSED]')
-        r.publish('STATUS', 'CLOSED')
+        # r.publish('STATUS', 'CLOSED')
 
     def on_ticks(ws, ticks):
         for tick in ticks:
             #print('tick', tick['instrument_token'])
-            r.publish(f'TICK_{tick["instrument_token"]}', tick)
+            # r.publish(f'TICK_{tick["instrument_token"]}', tick)
+            on_tick(f'TICK_{tick["instrument_token"]}', tick)
 
     def on_error(ws, code, reason):
         print('[ERROR]')
-        r.publish('STATUS', 'ERROR')
+        # r.publish('STATUS', 'ERROR')
 
     def on_message(ws, payload, is_binary):
         pass
 
     def on_reconnect(ws, attempts_count):
         print('[RECONNECTING]')
-        r.publish('STATUS', 'RECONNECTED')
+        # r.publish('STATUS', 'RECONNECTED')
 
     def on_noreconnect(ws):
         print('NO RECONNECTION')
         kws.close()
 
     def on_order_update(ws, data):
-        # print('[ORDER UPDATE')
-        # print('order updates', data)
-        r.publish('ORDER_UPDATE', data)
+        # r.publish('ORDER_UPDATE', data)
+        handle_order_update('ORDER_UPDATE', data)
         
 
     kws.on_connect = on_connect

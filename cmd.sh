@@ -1,1 +1,1 @@
-python3 remoteconfig.py & python3 connection.py & python3 trailsl.py & python3 order_updates.py & python3 place_orders.py
+python3 remoteconfig.py & python3 connection.py & python3 place_orders.py
