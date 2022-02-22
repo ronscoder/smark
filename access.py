@@ -25,13 +25,15 @@ def get_access_token():
     access_token = getConfig('ACCESS_TOKEN')
     print(access_token)
     if(access_token is None):
-        return get_new_token()
+        print('No access token')
+        return
     tokendatestr, token = access_token.split(":")
     tokendate = datetime.date(int(tokendatestr[:4]), int(
         tokendatestr[4:6]), int(tokendatestr[6:8]))
     today = datetime.date.today()
     if(today != tokendate):
-        return get_new_token()
+        print('Access token expired.')
+        return
     return token
 
 
@@ -45,4 +47,4 @@ def get_access_token():
 #     print()
 
 if __name__ == "__main__":
-    print(get_access_token())
+    print(get_new_token())
