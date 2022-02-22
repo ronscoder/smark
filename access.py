@@ -6,7 +6,7 @@ from libs.configs import getConfig, setConfig
 
 def get_new_token():
     kite = KiteConnect(api_key=getConfig('api_key'))
-    now = datetime.now()
+    now = datetime.datetime.now()
     print("Open")
     print(kite.login_url())
     webbrowser.open(kite.login_url(), new=0, autoraise=True)
