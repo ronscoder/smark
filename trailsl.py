@@ -8,6 +8,7 @@ p1 = get_ps_1()
 orderapi = Orderapi()
 
 def action(channel, data):
+    print('checking tick for new TRAIL')
     position = p1.get('CURRENT_BUY_ORDER')
     
     if(position == None):
