@@ -1,5 +1,4 @@
 import datetime
-import os
 import webbrowser
 from kiteconnect import KiteConnect
 from libs.configs import getConfig, setConfig
