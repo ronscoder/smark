@@ -2,7 +2,7 @@ from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 import threading
 from order_updates import handle_order_update
-from on_tick import on_tick
+from handle_on_tick import on_tick_handler
 # from multiprocessing import process
 'This is connection point to main server. and meant to run without interruptions and any complex calculations'
 r = get_ps_1()
@@ -23,9 +23,9 @@ def connect():
 
     def on_ticks(ws, ticks):
         for tick in ticks:
-            #print('tick', tick['instrument_token'])
+            print('tick', tick['instrument_token'], end='\r')
             # r.publish(f'TICK_{tick["instrument_token"]}', tick)
-            on_tick(f'TICK_{tick["instrument_token"]}', tick)
+            on_tick_handler(f'TICK_{tick["instrument_token"]}', tick)
 
     def on_error(ws, code, reason):
         print('[ERROR]')

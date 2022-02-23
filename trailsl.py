@@ -6,8 +6,12 @@ from libs.orderapi import Orderapi
 
 p1 = get_ps_1()
 orderapi = Orderapi()
+nifty_token = 260105
 
 def action(channel, data):
+    instrument_token = data['instrument_token']
+    if(instrument_token == nifty_token):
+        return
     print('checking tick for new TRAIL')
     position = p1.get('CURRENT_BUY_ORDER')
     

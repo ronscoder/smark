@@ -65,9 +65,9 @@ def handle_order_update(channel, data):
             # ps1.publish('SMARKMSG', f'bought {tradingsymbol} @ {price}')
             ps1.set('CURRENT_BUY_ORDER', data)
             orderApi.place_sl_sell_order(data)
-            time.sleep(2)
+            time.sleep(1)
             orderApi.cancel_open_buy_orders()
-            time.sleep(2)
+            time.sleep(1)
             # Activate driver for trailing SL
             ps1.publish('resubscription_tokens', {'flag':1, 'token': instrument_token})
 

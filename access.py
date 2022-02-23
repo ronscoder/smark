@@ -13,16 +13,16 @@ def get_new_token():
     if (request_token == ''):
         exit()
     data = kite.generate_session(request_token, api_secret=getConfig('api_secret'))
-    print(data)
+    # print(data)
     access_token = data['access_token']
     val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
     setConfig('ACCESS_TOKEN', val)
     return access_token
 
 def get_access_token():
-    print('ACCESS_TOKEN')
+    # print('ACCESS_TOKEN')
     access_token = getConfig('ACCESS_TOKEN')
-    print(access_token)
+    # print(access_token)
     if(access_token is None):
         print('No access token')
         return
