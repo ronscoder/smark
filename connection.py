@@ -20,6 +20,7 @@ def connect():
             tokens.append(order['instrument_token'])
         kws.subscribe(tokens)
         kws.set_mode(kws.MODE_FULL, tokens)
+        print('subscribed tokens', kws.subscribed_tokens)
         # r.publish('STATUS', 'CONNECTED')
 
     def on_close(ws, code, reason):

@@ -22,7 +22,7 @@ def action(channel, data):
     instrument_token = position['instrument_token']
     if(not channel == f'TICK_{instrument_token}'):
         return
-    print('trail SL check. position', tradingsymbol)
+    # print('trail SL check. position', tradingsymbol)
     ltp = data['last_price']
     price_bought = position['price']
     slorder = position['COUNTER_SL_ORDER']
@@ -33,12 +33,12 @@ def action(channel, data):
     increment = math.floor(base_price * getConfig('TRAIL_PC'))
     newstoploss = base_price + increment
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
-    print('base price', base_price, 'new stoploss',newstoploss, 'ltp', ltp)
+    print('trail SL', tradingsymbol, 'base price', base_price, 'new stoploss',newstoploss, 'ltp', ltp)
     if(ltp > (newstoploss + ltp*getConfig('TRAIL_BUFFER_PC'))):
         unit_pl = ltp - base_price
         factor = unit_pl//increment
         newstoploss = base_price + increment * factor
-        print(f'set new stoploss from {base_price} -> {newstoploss}', tradingsymbol)
+        print(f'{tradingsymbol} set new stoploss from {base_price} -> {newstoploss}')
         try:
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=newstoploss, trigger=newstoploss)
             position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss
