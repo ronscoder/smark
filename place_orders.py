@@ -51,7 +51,7 @@ if(__name__ == '__main__'):
         oorders = orderapi.get_open_orders()
         obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
         for order in obuyorders:
-            price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'])
+            price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
             print('new price', f'{price}/{trigger}')
             orderapi.modify_sl_order(order['order_id'], price, trigger)
         if(len(oorders) == 0):
