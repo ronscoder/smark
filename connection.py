@@ -23,7 +23,7 @@ def connect():
 
     def on_ticks(ws, ticks):
         for tick in ticks:
-            print('tick', tick['instrument_token'], end='\r')
+            print(tick['instrument_token'],tick['last_price'],  end='\r')
             # r.publish(f'TICK_{tick["instrument_token"]}', tick)
             on_tick_handler(f'TICK_{tick["instrument_token"]}', tick)
 
