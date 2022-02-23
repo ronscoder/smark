@@ -67,9 +67,6 @@ def handle_order_update(channel, data):
             orderApi.place_sl_sell_order(data)
             time.sleep(1)
             orderApi.cancel_open_buy_orders()
-            time.sleep(1)
-            # Activate driver for trailing SL
-            ps1.publish('resubscription_tokens', {'flag':1, 'token': instrument_token})
 
     if(txntype == KC.TRANSACTION_TYPE_SELL):
         if(status == 'TRIGGER PENDING'):
@@ -78,6 +75,9 @@ def handle_order_update(channel, data):
             buy_order['COUNTER_SL_ORDER'] = {'order_id': order_id, 'trigger_price': trigger_price, 'price': price}
             ps1.set('CURRENT_BUY_ORDER', buy_order)
             print(buy_order)
+            # Activate driver for trailing SL
+            ps1.publish('resubscription_tokens', {'flag':1, 'token': instrument_token})
+
         if(status == KC.STATUS_CANCELLED):
             pass
         if(status == KC.STATUS_REJECTED):
