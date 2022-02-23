@@ -64,16 +64,16 @@ class Orderapi:
 
     def place_sl_sell_order(self, orderdata):
         print('place SL sell order', orderdata['tradingsymbol'])
-        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'], orderdata['price'])
+        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'], orderdata['price'])
         params = {'variety': orderdata['variety'], "exchange": orderdata['exchange'], "tradingsymbol": orderdata['tradingsymbol'], "transaction_type": self.kite.TRANSACTION_TYPE_SELL,
                   "quantity": orderdata['quantity'], "order_type": self.kite.ORDER_TYPE_SL, "product": orderdata['product'], "price": price, 'trigger_price': stoploss_trigger}
         print('trigger', stoploss_trigger, 'price', price)
         order_id = self.kite.place_order(**params)
 
 
-    def get_sell_sl_prices(self, tradingsymbol, price_bought=0):
+    def get_sell_sl_prices(self, tradingsymbol, exchange, price_bought=0):
         kite = self.kite
-        symb = f'NFO:{tradingsymbol}'
+        symb = f'{exchange}:{tradingsymbol}'
         if(price_bought == 0):
             last_price = kite.ltp(symb)[symb]['last_price']
         else:
@@ -82,9 +82,9 @@ class Orderapi:
         trigger = price + getConfig('TRIGGER_GAP')
         return (price, trigger)
 
-    def get_buy_sl_prices(self, tradingsymbol):
+    def get_buy_sl_prices(self, tradingsymbol, exchange):
         kite = self.kite
-        symb = f'NFO:{tradingsymbol}'
+        symb = f'{exchange}:{tradingsymbol}'
         last_price = kite.ltp(symb)[symb]['last_price']
         price = round((1+float(getConfig('ENTRY_STOP_PC')))*last_price, 1)
         trigger = round(price - float(getConfig('TRIGGER_GAP')),1)
@@ -92,7 +92,7 @@ class Orderapi:
 
     def place_sl_buy_order(self, instsymbol, qty, exchange, price=0):
         kite = self.kite
-        order_price, trigger = self.get_buy_sl_prices(instsymbol)
+        order_price, trigger = self.get_buy_sl_prices(instsymbol, exchange)
         if(not price == 0):
             order_price = price
             trigger = price - getConfig('TRIGGER_GAP')

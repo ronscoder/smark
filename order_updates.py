@@ -39,9 +39,9 @@ def handle_order_update(channel, data):
     # print(data)
     print(tradingsymbol, txntype, status)
     logging.info(data)
-    # return
-    # print(datetime.now(), tradingsymbol, status, txntype, exchange)
-    if(not exchange == KC.EXCHANGE_NFO):
+    
+    if(not product == KC.PRODUCT_MIS):
+        print('skipping non MIS product')
         return
     #1:
     'Entry order, explicitly for options'
