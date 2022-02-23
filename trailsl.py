@@ -22,7 +22,7 @@ def action(channel, data):
     instrument_token = position['instrument_token']
     if(not channel == f'TICK_{instrument_token}'):
         return
-    print('trail SL check. position', position)
+    print('trail SL check. position', tradingsymbol)
     ltp = data['last_price']
     price_bought = position['price']
     slorder = position['COUNTER_SL_ORDER']

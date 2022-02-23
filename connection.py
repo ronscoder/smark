@@ -1,3 +1,4 @@
+from libs.orderapi import Orderapi
 from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 import threading
@@ -10,11 +11,15 @@ r = get_ps_1()
 def connect():
     'This module is intended to run continuously. '
     kc, kws = getKite()
-    index_tokens = [260105,] #nifty bank
+    
     def on_connect(ws, response):
+        tokens = [260105,] #nifty bank
         print('[CONNECTED]')
-        kws.subscribe(index_tokens)
-        kws.set_mode(kws.MODE_FULL, index_tokens)
+        orders = Orderapi().get_open_sell_orders()
+        for order in orders:
+            tokens.append(order['instrument_token'])
+        kws.subscribe(tokens)
+        kws.set_mode(kws.MODE_FULL, tokens)
         # r.publish('STATUS', 'CONNECTED')
 
     def on_close(ws, code, reason):
