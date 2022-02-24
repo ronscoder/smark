@@ -66,7 +66,7 @@ class DayHistories:
                 )
                 today = datetime.datetime.today().date()
                 ydata = yf.download(ysymbol, start=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
-                                    end=f'{today.year}-{today.month:02}-{today.day:02}', interval='5m')
+                                    end=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
                 self.day_histories[token].history = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
                                                         'close': ohlc['Close']} for r, ohlc in ydata.iterrows()]
 
