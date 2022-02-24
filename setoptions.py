@@ -5,6 +5,7 @@ from libs.init_kite import getKite
 from libs.configs import delConfig
 import pdb
 
+
 def set_options():
     # pdb.set_trace()
     delConfig('NIFTYBANK_CE')
@@ -18,17 +19,22 @@ def set_options():
         return
     nifty_bank_ltp = tick['last_price']
     # print(nifty_bank_ltp)
-    atm_ = int(nifty_bank_ltp - nifty_bank_ltp%100)
-    atm = atm_ if (nifty_bank_ltp - atm_) < (atm_ + 100 - nifty_bank_ltp) else atm_ + 100
+    atm_ = int(nifty_bank_ltp - nifty_bank_ltp % 100)
+    atm = atm_ if (nifty_bank_ltp - atm_) < (atm_ +
+                                             100 - nifty_bank_ltp) else atm_ + 100
     # print(atm)
     yy = '22'
     'next thursdays'
     mds = getConfig('OPTION_MD')
 
     strike_range = getConfig('STRIKE_RANGE')
+    strike_pe = (atm - strike_range['SKIP'] -
+                 strike_range['SPAN'], atm - strike_range['SKIP'])
+    strike_ce = (atm + strike_range['SKIP'], atm + strike_range['SPAN'] + strike_range['SKIP'])
 
-    ces = [f'BANKNIFTY{yy}{md}{strike}CE' for strike in range(atm + 100, max(strike_range), 100) for md in mds]
-    pes = [f'BANKNIFTY{yy}{md}{strike}PE' for strike in range(min(strike_range),atm - 100, 100) for md in mds]
+    ces = [f'BANKNIFTY{yy}{md}{strike}CE' for strike in range(
+        strike_ce[0], strike_ce[1], 100) for md in mds]
+    pes = [f'BANKNIFTY{yy}{md}{strike}PE' for strike in range(strike_pe[0], strike_pe[1], 100) for md in mds]
     # print(pes)
     # pdb.set_trace()
     ltps = kite.ltp([f'NFO:{inst}' for inst in [*ces, *pes]])
@@ -38,23 +44,27 @@ def set_options():
     # print(ltps)
     print()
     celtps = [(x, ltps[x]) for x in ltps if x[-2:] == 'CE']
-    celtps = [x for x in sorted(celtps, key=lambda x: x[1]['last_price']) if (price_range[0] <= x[1]['last_price'] <= price_range[1])]
-    if(len(celtps)>0):
+    celtps = [x for x in sorted(celtps, key=lambda x: x[1]['last_price']) if (
+        price_range[0] <= x[1]['last_price'] <= price_range[1])]
+    if(len(celtps) > 0):
         for ce in celtps:
             print(ce[0], ce[1]['last_price'])
         print(celtps[-1])
         # symbol, token
-        setConfig('NIFTYBANK_CE', (celtps[-1][0][4:], celtps[-1][1]['instrument_token']))
+        setConfig('NIFTYBANK_CE',
+                  (celtps[-1][0][4:], celtps[-1][1]['instrument_token']))
     print()
     peltps = [(x, ltps[x]) for x in ltps if x[-2:] == 'PE']
-    peltps = [x for x in sorted(peltps, key=lambda x: x[1]['last_price']) if (price_range[0] <= x[1]['last_price'] <= price_range[1])]
-    if(len(peltps)>0):
+    peltps = [x for x in sorted(peltps, key=lambda x: x[1]['last_price']) if (
+        price_range[0] <= x[1]['last_price'] <= price_range[1])]
+    if(len(peltps) > 0):
         for pe in peltps:
             print(pe[0], pe[1]['last_price'])
         print('PE')
         print(peltps[-1])
-        setConfig('NIFTYBANK_PE', (peltps[-1][0][4:],peltps[-1][1]['instrument_token']))
-    
+        setConfig('NIFTYBANK_PE',
+                  (peltps[-1][0][4:], peltps[-1][1]['instrument_token']))
+
 
 if(__name__ == '__main__'):
     set_options()
