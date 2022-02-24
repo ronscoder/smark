@@ -3,7 +3,6 @@ from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 import threading
 from order_updates import handle_order_update
-from handle_on_tick import on_tick_handler
 # from multiprocessing import process
 'This is connection point to main server. and meant to run without interruptions and any complex calculations'
 r = get_ps_1()
@@ -28,10 +27,14 @@ def connect():
         # r.publish('STATUS', 'CLOSED')
 
     def on_ticks(ws, ticks):
+        '''
+        {'tradable': False, 'mode': 'full', 'instrument_token': 260105, 'last_price': 37392.05, 'ohlc': {'high': 37774.6, 'low': 37318.0, 'open': 37628.55, 'close': 37371.65}, 'change': 0.05458683253215058, 'exchange_timestamp': datetime.datetime(2022, 2, 23, 17, 28, 11)}
+        '''
         for tick in ticks:
+            # print(tick)
             print(tick['instrument_token'],tick['last_price'],  end='\r')
-            # r.publish(f'TICK_{tick["instrument_token"]}', tick)
-            on_tick_handler(f'TICK_{tick["instrument_token"]}', tick)
+            r.publish(f'TICK_{tick["instrument_token"]}', tick)
+            # on_tick_handler(f'TICK_{tick["instrument_token"]}', tick)
 
     def on_error(ws, code, reason):
         print('[ERROR]')

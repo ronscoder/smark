@@ -5,9 +5,9 @@ from libs.configs import getConfig
 import sched
 import time
 import threading
-import logging
+# import logging
 
-logging.basicConfig(filename='logs/orderapi.log', level=logging.DEBUG)
+# # logging.basicConfig(filename='logs/orderapi.log', level=logging.DEBUG)
 
 
 class Orderapi:
@@ -39,8 +39,8 @@ class Orderapi:
         position = self.r1.hgetall('CURRENT_POSITION')
         if(position is not None):
             # self.kite.orders()
-            logging.info('cancelling open order')
-            logging.info(position)
+            # logging.info('cancelling open order')
+            # logging.info(position)
             orders = self.kite.orders()
             order = [x for x in orders if x['order_id']
                      == position['order_id']][0]
@@ -51,15 +51,15 @@ class Orderapi:
     def modify_sl_order(self, order_id, price, trigger):
         params = dict(variety=KC.VARIETY_REGULAR, order_id=order_id,
                       order_type=KC.ORDER_TYPE_SL, price=price, trigger_price=trigger)
-        logging.info('modifying SL order')
-        logging.info(params)
+        # logging.info('modifying SL order')
+        # logging.info(params)
         self.kite.modify_order(**params)
 
     def position_scheduler(self, tradingsybmol):
         s = sched.scheduler(time.time, time.sleep)
         s.enter(getConfig('DURATION_OPEN_POSITION_MIN')*60,
                 1, self.cancel_position)
-        logging.info('open position scheduler started')
+        # logging.info('open position scheduler started')
         s.run()
 
     def place_sl_sell_order(self, orderdata):
