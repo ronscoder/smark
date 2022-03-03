@@ -15,6 +15,7 @@ def mva(window_size, data):
     return pd.Series(data).rolling(window=window_size).mean()
 
 ma1 = mva(5, closes)
+print(ma1[-1])
 ax1.plot(ma1, color='green')
 
 ma2 = mva(15, closes)
@@ -23,4 +24,4 @@ ax1.plot(ma2, color='red')
 diff = [ma2[i]-ma1[i] for i in range(len(closes))]
 ax2.plot(diff)
 
-plt.show()
+# plt.show()
