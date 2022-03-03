@@ -17,10 +17,10 @@ def calculate(channel, data):
     malong = mva(max(ma_periods), closes)
     ltp = ps1.get('TICK_260105')['last_price']
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    if(ltp < mashort < malong):
+    if(ltp < mashort[-1] < malong[-1]):
         print('BANKNIFTY_DIRECTION', 1)
         ps1.set('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': 1})
-    elif(ltp > mashort > malong):
+    elif(ltp > mashort[-1] > malong[-1]):
         print('BANKNIFTY_DIRECTION', -1)
         ps1.set('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': -1})
     else:
