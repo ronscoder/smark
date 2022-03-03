@@ -3,3 +3,4 @@ redis==4.1.2
 telegram-send==0.25
 firebase_admin==5.2.0
 yfinance==0.1.70
+pandas

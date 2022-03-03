@@ -1,10 +1,9 @@
 from kiteconnect.connect import KiteConnect as KC
-from libs.pubsub import get_ps_1, get_ps_2
+from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 from libs.configs import getConfig
 import sched
 import time
-import threading
 # import logging
 
 # # logging.basicConfig(filename='logs/orderapi.log', level=logging.DEBUG)
@@ -55,11 +54,10 @@ class Orderapi:
         # logging.info(params)
         self.kite.modify_order(**params)
 
-    def position_scheduler(self, tradingsybmol):
+    def position_scheduler(self):
         s = sched.scheduler(time.time, time.sleep)
-        s.enter(getConfig('DURATION_OPEN_POSITION_MIN')*60,
-                1, self.cancel_position)
-        # logging.info('open position scheduler started')
+        s.enter(getConfig('OPEN_ORDER_EXPIRY_MIN')*60,
+                1, self.cancel_open_buy_orders)
         s.run()
 
     def place_sl_sell_order(self, orderdata):

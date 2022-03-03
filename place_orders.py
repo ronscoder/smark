@@ -20,7 +20,8 @@ def place_orders():
         print('Trade execution on hold by remote')
         return
     # market window
-    if(not (datetime.time(hour=9, minute=15) < datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata')).time() < datetime.time(hour=15, minute=0))):
+    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    if(not (datetime.time(hour=9, minute=15) < timestamp.time() < datetime.time(hour=15, minute=0))):
         print('Outside market time window')
         logging.info('Outside market time window')
         return
@@ -30,17 +31,30 @@ def place_orders():
         return
     # place intraday orders
     # return
-    set_options()
-    time.sleep(2)
-    try:
-        ce = getConfig(f'NIFTYBANK_CE')[0]
-        orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
-        pe = getConfig(f'NIFTYBANK_PE')[0]
-        time.sleep(2)
-        orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
-    except Exception as ex:
-        print('Error placing orders')
-        print(ex.__str__())
+    direction = ps1.get('BANKNIFTY_DIRECTION')
+    if(direction == None):
+        print('No direction detected')
+        return
+    if(direction['direction']==1):
+        if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
+            inst, _ = set_options(if_ce=True, if_pe=False)
+            time.sleep(2)
+            try:
+                ce = inst[0]
+                orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
+            except Exception as ex:
+                print('Error placing orders for: ', inst)
+                print(ex.__str__())
+    if(direction['direction']==-1):
+        if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
+            inst, _ = set_options(if_ce=False, if_pe=True)
+            time.sleep(2)
+            try:
+                pe = inst[0]
+                orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
+            except Exception as ex:
+                print('Error placing orders for: ', inst)
+                print(ex.__str__())
 
 
 if(__name__ == '__main__'):

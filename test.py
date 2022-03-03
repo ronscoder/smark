@@ -1,23 +1,26 @@
 import matplotlib.pyplot as plt
 from libs.pubsub import get_ps_1
-from price_recorder import get_last_working_day
-import datetime
-import yfinance as yf
-
+import pandas as pd
 p1 = get_ps_1()
 
 datap = p1.get('HISTORY_260105')
 
-last_working_day = get_last_working_day()
-today = datetime.datetime.today().date()
-ydata = yf.download('^NSEBANK', start=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
-                    end=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
+ax1 = plt.subplot(2, 1, 1)
+ax2 = plt.subplot(2, 1, 2)
 
-data = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
-         'close': ohlc['Close']} for r, ohlc in ydata.iterrows()]
+closes = [d['close'] for d in datap]
+ax1.plot(closes, color='black')
 
-import pdb
-pdb.set_trace()
-# plt.plot([d['close']+50 for d in datap], )
-# plt.plot([d['close'] for d in data])
-# plt.show()
+def mva(window_size, data):
+    return pd.Series(data).rolling(window=window_size).mean()
+
+ma1 = mva(5, closes)
+ax1.plot(ma1, color='green')
+
+ma2 = mva(15, closes)
+ax1.plot(ma2, color='red')
+
+diff = [ma2[i]-ma1[i] for i in range(len(closes))]
+ax2.plot(diff)
+
+plt.show()

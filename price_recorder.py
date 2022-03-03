@@ -1,7 +1,7 @@
 from libs.configs import getConfig
 from libs.pubsub import get_ps_1
 import datetime
-import yfinance as yf
+from libs.utilities import ydownload
 
 p1 = get_ps_1()
 
@@ -65,13 +65,13 @@ class DayHistories:
                 last_working_day = get_last_working_day(
                 )
                 today = datetime.datetime.today().date()
-                ydata = yf.download(ysymbol, start=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
-                                    end=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
+                ydata = ydownload(ysymbol, startdate=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
+                                    enddate=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
                 self.day_histories[token].history = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
                                                         'close': ohlc['Close']} for r, ohlc in ydata.iterrows()]
 
     def record(self, channel, data):
-        print(channel, data)
+        # print(channel, data)
         token = data['instrument_token']
         self.day_histories[token].feed(data)
 
