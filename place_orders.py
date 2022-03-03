@@ -47,7 +47,7 @@ def place_orders():
                 print(ex.__str__())
     if(direction['direction']==-1):
         if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
-            inst, _ = set_options(if_ce=False, if_pe=True)
+            _ , inst = set_options(if_ce=False, if_pe=True)
             time.sleep(2)
             try:
                 pe = inst[0]
