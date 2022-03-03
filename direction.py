@@ -12,8 +12,9 @@ ps1 = get_ps_1()
 def calculate(channel, data):
     # print('history', len(data))
     ma_periods = getConfig('MA_PERIODS')
-    mashort = mva(min(ma_periods))
-    malong = mva(max(ma_periods))
+    closes = [d['close'] for d in data]
+    mashort = mva(min(ma_periods), closes)
+    malong = mva(max(ma_periods), closes)
     ltp = ps1.get('TICK_260105')['last_price']
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     if(ltp < mashort < malong):
