@@ -17,12 +17,16 @@ def calculate(channel, data):
     ltp = ps1.get('TICK_260105')['last_price']
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     if(ltp < mashort < malong):
+        print('BANKNIFTY_DIRECTION', 1)
         ps1.set('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': 1})
     elif(ltp > mashort > malong):
+        print('BANKNIFTY_DIRECTION', -1)
         ps1.set('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': -1})
     else:
+        print('BANKNIFTY_DIRECTION', 0)
         ps1.set('BANKNIFTY_DIRECTION', None)
 
 
 if(__name__=='__main__'):
+    print('Scanning direction from history')
     ps1.subscribe(['HISTORY_260105'], calculate)
