@@ -64,7 +64,6 @@ def set_options(if_ce=True, if_pe=True):
     if(len(peltps) > 0):
         for pe in peltps:
             print(pe[0], pe[1]['last_price'])
-        print('PE')
         print(peltps[-1])
         pe = (peltps[-1][0][4:], peltps[-1][1]['instrument_token'])
         # setConfig('NIFTYBANK_PE',
