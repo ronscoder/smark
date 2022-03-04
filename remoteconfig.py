@@ -39,12 +39,15 @@ def getRemoteConfigs():
 # Watch the document
 configs_ref.on_snapshot(on_snapshot)
 
-while True:
-    print('remote config listening...')
-    time.sleep(60)
+# while True:
+#     print('remote config listening...')
+#     time.sleep(60)
 
 # if(__name__=='__main__'):
 #     configs = getRemoteConfigs()
 #     print(configs)
 #     print(configs['HOLD_EXE']==True)
-    
+
+condition = threading.Condition()
+condition.acquire()
+condition.wait()
