@@ -8,6 +8,7 @@ import time
 
 # # logging.basicConfig(filename='logs/orderapi.log', level=logging.DEBUG)
 
+# TODO redesign other program to wait for a valid OrderAPI
 
 class Orderapi:
     def __init__(self) -> None:

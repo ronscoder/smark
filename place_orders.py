@@ -14,7 +14,7 @@ ps1 = get_ps_1()
 orderapi = Orderapi()
 
 
-def place_orders():
+def place_orders(direction):
     
     if(getConfig('HOLD_EXE')):
         print('Trade execution on hold by remote')
@@ -29,53 +29,66 @@ def place_orders():
         return
     if(not getTruthsOf('GENERAL')):
         return
-    # place intraday orders
-    # return
-    direction = ps1.get('BANKNIFTY_DIRECTION')
     if(direction == None):
         print('No direction detected')
         return
     if(direction['direction']==1):
-        if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
-            inst, _ = set_options(if_ce=True, if_pe=False)
-            time.sleep(2)
-            try:
-                ce = inst[0]
-                orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
-            except Exception as ex:
-                print('Error placing orders for: ', inst)
-                print(ex.__str__())
+        # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
+        inst, _ = set_options(if_ce=True, if_pe=False)
+        time.sleep(2)
+        try:
+            ce = inst[0]
+            orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
+        except Exception as ex:
+            print('Error placing orders for: ', inst)
+            print(ex.__str__())
+        return
     if(direction['direction']==-1):
-        if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
-            _ , inst = set_options(if_ce=False, if_pe=True)
-            time.sleep(2)
-            try:
-                pe = inst[0]
-                orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
-            except Exception as ex:
-                print('Error placing orders for: ', inst)
-                print(ex.__str__())
+        # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
+        _ , inst = set_options(if_ce=False, if_pe=True)
+        time.sleep(2)
+        try:
+            pe = inst[0]
+            orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
+        except Exception as ex:
+            print('Error placing orders for: ', inst)
+            print(ex.__str__())
+        return
 
+
+def action(channel, data):
+    print(data)
+    direction = data['direction']
+    timestamp = data['timestamp']
+    'Change price and trigger for open buy orders'
+    print('PLACE ORDERS checking...')
+    oorders = orderapi.get_open_orders()
+    if(len(oorders) == 0):
+        #=> there is no open sell orders
+        print('There is no position.', 'Placing order...')
+        try:
+            place_orders(direction)
+        except Exception as ex:
+            print('Error placing orders')
+            print(ex.__str__())
+        return
+    now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    timepast = now - timestamp
+    expiry_min = getConfig('OPEN_ORDER_EXPIRY_MIN')
+    obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
+    if(len(obuyorders) > 0):
+        print('There are open buy orders', len(obuyorders))
+        if(timepast > datetime.timedelta(minutes=expiry_min)):
+            print('Canceling expired open buy orders', expiry_min)
+            orderapi.cancel_open_buy_orders()
+        elif(timepast > datetime.timedelta(minutes=round(expiry_min/2))):
+            print('Changing open buy order triggers')
+            for order in obuyorders:
+                price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
+                print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
+                orderapi.modify_sl_order(order['order_id'], price, trigger)
 
 if(__name__ == '__main__'):
-    cancel_open_order_counter = 0
-    while True:
-        'Change price and trigger for open buy orders'
-        print('PLACE ORDERS checking...')
-        oorders = orderapi.get_open_orders()
-        obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
-        for order in obuyorders:
-            price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
-            print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
-            orderapi.modify_sl_order(order['order_id'], price, trigger)
-        if(len(oorders) == 0):
-            try:
-                place_orders()
-            except Exception as ex:
-                print('Error placing orders')
-                print(ex.__str__())
-        time.sleep(getConfig('OPEN_ORDER_EXPIRY_MIN')*60)
-        cancel_open_order_counter += 1
-        if(len(obuyorders) > 0 and cancel_open_order_counter%2 == 0):
-            orderapi.cancel_open_buy_orders()
-            cancel_open_order_counter = 0
+    print('Place order started')
+    ps1.subscribe(['BANKNIFTY_DIRECTION'], action)
+

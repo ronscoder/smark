@@ -6,10 +6,9 @@ from access import get_access_token
 
 def getKite():
         token = get_access_token()
-        try:
-            kite = KiteConnect(api_key=getConfig(
-                'api_key'), access_token= token)
-            kws = KiteTicker(getConfig('api_key'), token)
-        except:
-            return None, None
+        if(token == None):
+            return
+        kite = KiteConnect(api_key=getConfig(
+            'api_key'), access_token= token)
+        kws = KiteTicker(getConfig('api_key'), token)
         return kite, kws
