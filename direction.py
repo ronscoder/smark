@@ -12,7 +12,7 @@ ps1 = get_ps_1()
 def calculate(channel, data):
     # print('history', len(data))
     configs = getConfigs()
-    ma_periods = configs('MA_PERIODS')
+    ma_periods = configs['MA_PERIODS']
     closes = [d['close'] for d in data]
     opens = [d['open'] for d in data]
     mashort = mva(min(ma_periods), closes)
