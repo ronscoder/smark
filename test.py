@@ -1,27 +1,24 @@
 import matplotlib.pyplot as plt
 from libs.pubsub import get_ps_1
 import pandas as pd
+from libs.candle import plot
+from libs.tools import mva
+
 p1 = get_ps_1()
 
 datap = p1.get('HISTORY_260105')
 
-ax1 = plt.subplot(2, 1, 1)
-ax2 = plt.subplot(2, 1, 2)
+data = [{'Open': x['open'], 'Close': x['close'], 'High': x['high'], 'Low': x['low']} for x in datap]
+# ax1 = plt.subplot(2, 1, 1)
+# ax2 = plt.subplot(2, 1, 2)
+ax1 = plt.gca()
 
-closes = [d['close'] for d in datap]
-ax1.plot(closes, color='black')
+plot(ax1, data)
 
-def mva(window_size, data):
-    return pd.Series(data).rolling(window=window_size).mean()
+mva1 = mva(5, [x['Close'] for x in data])
+mva2 = mva(15, [x['Close'] for x in data])
 
-ma1 = mva(5, closes)
-print(ma1[-1])
-ax1.plot(ma1, color='green')
+plt.plot(mva1, color='green')
+plt.plot(mva2, color='red')
 
-ma2 = mva(15, closes)
-ax1.plot(ma2, color='red')
-
-diff = [ma2[i]-ma1[i] for i in range(len(closes))]
-ax2.plot(diff)
-
-# plt.show()
+plt.show()

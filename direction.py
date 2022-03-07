@@ -14,20 +14,35 @@ def calculate(channel, data):
     configs = getConfigs()
     ma_periods = configs['MA_PERIODS']
     closes = [d['close'] for d in data]
-    opens = [d['open'] for d in data]
+    # opens = [d['open'] for d in data]
     mashort = mva(min(ma_periods), closes)
     malong = mva(max(ma_periods), closes)
-    # ltp = ps1.get('TICK_260105')['last_price']
+    ltp = closes[-1]
+    # ftp = opens[-1]
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     direction = None
+    ltp_change_pc = (closes[-2] - ltp)/closes[-2]*100
+
+    #: Trending
     if(mashort.iloc[-1] > malong.iloc[-1]):
-        bullish = abs((closes[-1] - opens[-1])/opens[-1]*100) > configs['CANDLE_MOMENTUM_PC']
+        bullish = abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
         if(bullish):
             direction = 1
     elif(mashort.iloc[-1] < malong.iloc[-1]):
-        bearish = abs((opens[-1] - closes[-1])/opens[-1]*100) > configs['CANDLE_MOMENTUM_PC']
+        bearish = abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
         if(bearish):
             direction = -1
+    
+    #: Reversal
+    if(direction == None):
+        if(mashort.iloc[-1] < malong.iloc[-1]):
+            cond = ltp > closes[-2] and ltp > mashort.iloc[-1] and abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
+            if(cond):
+                direction = 1
+        elif(mashort.iloc[-1] > malong.iloc[-1]):
+            cond = ltp < closes[-2] and ltp < mashort.iloc[-1] and abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
+            if(cond):
+                direction = -1
     print('BANKNIFTY_DIRECTION', direction)
     ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction})
 

@@ -65,6 +65,7 @@ class DayHistories:
                 last_working_day = get_last_working_day(
                 )
                 today = datetime.datetime.today().date()
+                print('downloading historical for ', ysymbol)
                 ydata = ydownload(ysymbol, startdate=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
                                     enddate=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
                 self.day_histories[token].history = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
