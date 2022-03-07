@@ -21,11 +21,11 @@ def calculate(channel, data):
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     direction = None
     if(mashort.iloc[-1] > malong.iloc[-1]):
-        bullish = (closes[-1] - opens[-1])/opens[-1]*100 > configs['CANDLE_MOMENTUM_PC']
+        bullish = abs((closes[-1] - opens[-1])/opens[-1]*100) > configs['CANDLE_MOMENTUM_PC']
         if(bullish):
             direction = 1
     elif(mashort.iloc[-1] < malong.iloc[-1]):
-        bearish = (opens[-1] - closes[-1])/opens[-1]*100 > configs['CANDLE_MOMENTUM_PC']
+        bearish = abs((opens[-1] - closes[-1])/opens[-1]*100) > configs['CANDLE_MOMENTUM_PC']
         if(bearish):
             direction = -1
     print('BANKNIFTY_DIRECTION', direction)
