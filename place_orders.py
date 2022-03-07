@@ -32,7 +32,7 @@ def place_orders(direction):
     if(direction == None):
         print('No direction detected')
         return
-    if(direction['direction']==1):
+    if(direction==1):
         # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
         inst, _ = set_options(if_ce=True, if_pe=False)
         time.sleep(2)
@@ -43,7 +43,7 @@ def place_orders(direction):
             print('Error placing orders for: ', inst)
             print(ex.__str__())
         return
-    if(direction['direction']==-1):
+    if(direction==-1):
         # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
         _ , inst = set_options(if_ce=False, if_pe=True)
         time.sleep(2)
