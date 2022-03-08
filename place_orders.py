@@ -78,7 +78,8 @@ def action(channel, data):
     if(len(obuyorders) > 0):
         print('There are open buy orders', len(obuyorders))
         for order in obuyorders:
-            timepast = now - order['order_timestamp']
+            order_time = order['order_timestamp']
+            timepast = now.replace(tzinfo=None) - order_time
             if(timepast > datetime.timedelta(minutes=expiry_min)):
                 print('Canceling expired open buy orders', expiry_min)
                 orderapi.cancel_open_buy_orders()
