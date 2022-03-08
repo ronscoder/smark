@@ -94,7 +94,7 @@ def handle_order_update(channel, data):
                 pass
             ps1.r.delete('CURRENT_BUY_ORDER')
             ps1.publish('resubscription_tokens', {'flag':-1, 'token': instrument_token})
-            place_orders()
+            # place_orders()
 
         if(status == 'OPEN'):
             pass
