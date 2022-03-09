@@ -3,9 +3,9 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 import threading
-import time
-from libs.configs import setConfigs
 
+from libs.configs import setConfigs
+from access import get_access_token, get_new_token
 
 # Use the application default credentials
 # cred = credentials.ApplicationDefault()
@@ -16,20 +16,24 @@ firebase_admin.initialize_app(cred, {
 
 db = firestore.client()
 configs_ref = db.collection(u'configs').document(u'VIp4hCZGXPOqyJMNDc6H')
+access_ref = db.collection(u'configs').document(u'access')
 # Create an Event for notifying main thread.
 
 callback_done = threading.Event()
 # Create a callback on_snapshot function to capture changes
 def on_snapshot(doc_snapshot, changes, read_time):
-    # for doc in doc_snapshot:
-    #     # configs = doc.to_dict()
-    #     # print(configs)
-    #     # setConfigs(configs)
-    for change in changes:
-        configs = change.document.to_dict()
+    for doc in doc_snapshot:
+        configs = doc.to_dict()
         print(configs)
         setConfigs(configs)
-    # callback_done.set()
+
+def on_access_snapshot(doc_snapshot, changes, read_time):
+    for doc in doc_snapshot:
+        configs = doc.to_dict()
+        if('request_token' in configs):
+            access_token = get_access_token()
+            if(access_token is None):
+                get_new_token(configs['request_token'])
 
 def getRemoteConfigs():
     doc = configs_ref.get()
@@ -38,15 +42,7 @@ def getRemoteConfigs():
 
 # Watch the document
 configs_ref.on_snapshot(on_snapshot)
-
-# while True:
-#     print('remote config listening...')
-#     time.sleep(60)
-
-# if(__name__=='__main__'):
-#     configs = getRemoteConfigs()
-#     print(configs)
-#     print(configs['HOLD_EXE']==True)
+access_ref.on_snapshot(on_access_snapshot)
 
 condition = threading.Condition()
 condition.acquire()

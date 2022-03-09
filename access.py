@@ -2,26 +2,38 @@ import datetime
 import webbrowser
 from kiteconnect import KiteConnect
 from libs.configs import getConfig, setConfig
+# from boto.s3.connection import S3Connection
+import os
 
-def get_new_token():
+def get_new_token(request_token=None):
     kite = KiteConnect(api_key=getConfig('api_key'))
     now = datetime.datetime.now()
-    print("Open")
     print(kite.login_url())
-    webbrowser.open(kite.login_url(), new=0, autoraise=True)
-    request_token = input('Enter request token: ')
-    if (request_token == ''):
-        exit()
-    data = kite.generate_session(request_token, api_secret=getConfig('api_secret'))
-    # print(data)
-    access_token = data['access_token']
-    val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
-    setConfig('ACCESS_TOKEN', val)
-    return access_token
+    if(request_token is None):
+        print("Open")
+        # print(kite.login_url())
+        webbrowser.open(kite.login_url(), new=0, autoraise=True)
+        request_token = input('Enter request token: ')
+        if (request_token == ''):
+            exit()
+    try:
+        data = kite.generate_session(request_token, api_secret=getConfig('api_secret'))
+        # print(data)
+        access_token = data['access_token']
+        val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
+        # setConfig('ACCESS_TOKEN', val)
+        print('new access token', val)
+        os.environ['ACCESS_TOKEN'] = val
+        return access_token
+    except Exception as ex: 
+        print('ERROR getting new access token', ex.__str__())
+        return None
+
 
 def get_access_token():
     # print('ACCESS_TOKEN')
-    access_token = getConfig('ACCESS_TOKEN')
+    # access_token = getConfig('ACCESS_TOKEN')
+    access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
     if(access_token is None):
         print('No access token')
