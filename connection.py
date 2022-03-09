@@ -23,7 +23,7 @@ def connect():
         # r.publish('STATUS', 'CONNECTED')
 
     def on_close(ws, code, reason):
-        print('[CLOSED]')
+        print('[CLOSED]', code, reason)
         # r.publish('STATUS', 'CLOSED')
 
     def on_ticks(ws, ticks):
@@ -37,7 +37,7 @@ def connect():
             # on_tick_handler(f'TICK_{tick["instrument_token"]}', tick)
 
     def on_error(ws, code, reason):
-        print('[ERROR]')
+        print('[ERROR]', code, reason)
         # r.publish('STATUS', 'ERROR')
 
     def on_message(ws, payload, is_binary):
