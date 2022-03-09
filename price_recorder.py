@@ -74,7 +74,8 @@ class DayHistories:
     def record(self, channel, data):
         # print(channel, data)
         token = data['instrument_token']
-        self.day_histories[token].feed(data)
+        if(token in self.tokens):
+            self.day_histories[token].feed(data)
 
 
 if(__name__ == '__main__'):
@@ -82,4 +83,4 @@ if(__name__ == '__main__'):
     tokens = [260105, ]
     ysymbols = {260105: '^NSEBANK'}
     dayhistories = DayHistories(tokens, ysymbols)
-    p1.subscribe(['TICK_260105'], cb=dayhistories.record)
+    p1.subscribe([f'TICK_{token}' for token in tokens], cb=dayhistories.record)
