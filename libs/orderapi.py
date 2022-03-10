@@ -87,7 +87,8 @@ class Orderapi:
 
     def place_sl_sell_order(self, orderdata):
         print('place SL sell order', orderdata['tradingsymbol'])
-        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'], orderdata['price'])
+        # price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'], orderdata['price'])
+        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'])
         if(self.kite is None):
             print('Error in Order API')
             return
