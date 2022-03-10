@@ -22,7 +22,7 @@ def calculate(channel, data):
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
 
     direction = None
-    ltp_change_pc = (closes[-3] - ltp)/closes[-3]*100
+    ltp_change_pc = (ltp - closes[-3])/closes[-3]*100
 
     print('Closes[-3]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
