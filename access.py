@@ -21,9 +21,9 @@ def get_new_token(request_token=None):
         # print(data)
         access_token = data['access_token']
         val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
-        # setConfig('ACCESS_TOKEN', val)
+        setConfig('ACCESS_TOKEN', val)
         print('new access token', val)
-        os.environ['ACCESS_TOKEN'] = val
+        # os.environ['ACCESS_TOKEN'] = val
         return access_token
     except Exception as ex: 
         print('ERROR getting new access token', ex.__str__())
@@ -32,8 +32,8 @@ def get_new_token(request_token=None):
 
 def get_access_token():
     # print('ACCESS_TOKEN')
-    # access_token = getConfig('ACCESS_TOKEN')
-    access_token = os.environ.get('ACCESS_TOKEN', None)
+    access_token = getConfig('ACCESS_TOKEN')
+    # access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
     if(access_token is None):
         print('No access token')
