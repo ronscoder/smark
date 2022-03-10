@@ -87,8 +87,8 @@ class Orderapi:
 
     def place_sl_sell_order(self, orderdata):
         print('place SL sell order', orderdata['tradingsymbol'])
-        # price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'], orderdata['price'])
-        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'])
+        price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'], orderdata['price'])
+        # price, stoploss_trigger = self.get_sell_sl_prices(orderdata['tradingsymbol'],orderdata['exchange'])
         if(self.kite is None):
             print('Error in Order API')
             return
@@ -101,17 +101,22 @@ class Orderapi:
         order_id = self.kite.place_order(**params)
 
 
-    def get_sell_sl_prices(self, tradingsymbol, exchange, price_bought=0):
+    def get_sell_sl_prices(self, tradingsymbol, exchange, price_bought):
         if(self.kite is None):
             print('Error in Order API')
             return
         kite = self.kite
         symb = f'{exchange}:{tradingsymbol}'
-        if(price_bought == 0):
-            last_price = kite.ltp(symb)[symb]['last_price']
-        else:
-            last_price = price_bought
-        price = round((1 - float(getConfig('STOP_PC')))*last_price, 1)
+        ltp = kite.ltp(symb)[symb]['last_price']
+        # if(price_bought == 0):
+        #     last_price = kite.ltp(symb)[symb]['last_price']
+        # else:
+        #     last_price = price_bought
+        stop_pc = float(getConfig('STOP_PC'))
+        price = round(1 - stop_pc*price_bought, 1)
+        if(ltp < price):
+            print(f'cannot set SL at {price} since ltp is {ltp}. setting wrt ltp...')
+            price = round(1 - stop_pc*ltp, 1)
         trigger = price + getConfig('TRIGGER_GAP')
         return (price, trigger)
 
