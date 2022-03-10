@@ -22,24 +22,24 @@ def calculate(channel, data):
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
 
     direction = None
-    ltp_change_pc = (ltp - closes[-3])/closes[-3]*100
+    ltp_change_pc = (ltp - closes[-2])/closes[-2]*100
 
-    print('Closes[-3]-[-1]', ltp_change_pc)
+    print('Closes[-2]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
         #: Trending
-        if(mashort.iloc[-1] > malong.iloc[-1]):
+        if(ltp > mashort.iloc[-1] > malong.iloc[-1]):
             direction = 1
-        elif(mashort.iloc[-1] < malong.iloc[-1]):
+        elif(ltp < mashort.iloc[-1] < malong.iloc[-1]):
             direction = -1
         
         #: Reversal
         if(direction == None):
             if(mashort.iloc[-1] < malong.iloc[-1]):
-                cond = ltp > closes[-2] and ltp > mashort.iloc[-1]
+                cond = ltp > malong.iloc[-1]
                 if(cond):
                     direction = 1
             elif(mashort.iloc[-1] > malong.iloc[-1]):
-                cond = ltp < closes[-2] and ltp < mashort.iloc[-1]
+                cond = ltp < malong.iloc[-1]
                 if(cond):
                     direction = -1
     print('BANKNIFTY_DIRECTION', direction)
