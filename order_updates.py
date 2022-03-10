@@ -85,13 +85,13 @@ def handle_order_update(channel, data):
             pass
 
         if(status == KC.STATUS_COMPLETE):
-            ps1.publish('SMARKMSG', f'sold {tradingsymbol} @ {price}')
-            order = ps1.get('CURRENT_BUY_ORDER')
-            try:
-                pl = price - order['price']
-                ps1.publish('SMARKMSG', f'profit/loss {tradingsymbol} @ {round(pl,1)*qty}')
-            except:
-                pass
+            # ps1.publish('SMARKMSG', f'sold {tradingsymbol} @ {price}')
+            # order = ps1.get('CURRENT_BUY_ORDER')
+            # try:
+            #     pl = price - order['price']
+            #     ps1.publish('SMARKMSG', f'profit/loss {tradingsymbol} @ {round(pl,1)*qty}')
+            # except:
+            #     pass
             ps1.r.delete('CURRENT_BUY_ORDER')
             ps1.publish('resubscription_tokens', {'flag':-1, 'token': instrument_token})
             # place_orders()
