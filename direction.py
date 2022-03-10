@@ -24,6 +24,7 @@ def calculate(channel, data):
     direction = None
     ltp_change_pc = (closes[-3] - ltp)/closes[-3]*100
 
+    print('Closes[-3]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
         #: Trending
         if(mashort.iloc[-1] > malong.iloc[-1]):
