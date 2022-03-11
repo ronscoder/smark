@@ -81,13 +81,16 @@ def action(channel, data):
             order_time = order['order_timestamp']
             timepast = now.replace(tzinfo=None) - order_time
             if(timepast > datetime.timedelta(minutes=expiry_min)):
-                print('Canceling expired open buy orders', expiry_min)
-                orderapi.cancel_open_buy_orders()
-            elif(timepast > datetime.timedelta(minutes=round(expiry_min/2))):
                 print('Changing open buy order triggers')
                 price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
-                print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
-                orderapi.modify_sl_order(order['order_id'], price, trigger)
+                price_range = getConfig('OPTION_PRICE_RANGE')
+                if(price in price_range):
+                    print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
+                    orderapi.modify_sl_order(order['order_id'], price, trigger)
+                else:
+                    print('Canceling expired open buy orders', expiry_min)
+                    orderapi.cancel_open_buy_orders()
+            # elif(timepast > datetime.timedelta(minutes=round(expiry_min/2))):
 
 if(__name__ == '__main__'):
     print('Place order started')
