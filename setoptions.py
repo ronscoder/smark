@@ -4,6 +4,14 @@ from libs.pubsub import get_ps_1
 from libs.init_kite import getKite
 import pdb
 
+def get_next_thursday_date(week=1):
+    today = datetime.datetime.today()
+    days_to_next_thursday = 7*week + 3 - today.weekday()
+    return today + datetime.timedelta(days=days_to_next_thursday)
+
+def get_strikes():
+    pass
+
 def set_options(if_ce=True, if_pe=True):
     # pdb.set_trace()
     # delConfig('NIFTYBANK_CE')
@@ -25,19 +33,56 @@ def set_options(if_ce=True, if_pe=True):
     today = datetime.datetime.today()
     yy = today.strftime('%y')
     strikes = getConfig('STRIKES')
-
+    # print(strikes)
+    # return
     insts = []
-    for strike in strikes:
-        msuffix = strike['suffix']
-        strike_min = strike['min']
-        strike_max = strike['max']
-        options = []
-        if(if_ce):
-            options = [f'BANKNIFTY{yy}{msuffix}{x}CE' for x in range(atm, strike_max, 100)]
-            insts.extend(options)
-        if(if_pe):
-            options = [f'BANKNIFTY{yy}{msuffix}{x}PE' for x in range(strike_min, atm, 100)]
-            insts.extend(options)
+
+    
+    next_thursday_1 = get_next_thursday_date(1)
+    mdd_current_week = f'{today.month}{next_thursday_1.day:02}'
+    if(strikes['CURRENT_WEEK']['ALL']):
+        low = atm - 40 * 100
+        high = atm + 40 * 100
+    else:
+        low = strikes['CURRENT_WEEK']['LOW']
+        high = strikes['CURRENT_WEEK']['HIGH']
+    if(if_ce):
+        options = [f'BANKNIFTY{yy}{mdd_current_week}{x}CE' for x in range(atm, high, 100)]
+        insts.extend(options)
+    if(if_pe):
+        options = [f'BANKNIFTY{yy}{mdd_current_week}{x}PE' for x in range(low, atm, 100)]
+        insts.extend(options)
+
+
+    next_thursday_2 = get_next_thursday_date(2)
+    mdd_next_week = f'{today.month}{next_thursday_2.day:02}'
+    if(strikes['NEXT_WEEK']['ALL']):
+        low = atm - 40 * 100
+        high = atm + 40 * 100
+    else:
+        low = strikes['NEXT_WEEK']['LOW']
+        high = strikes['NEXT_WEEK']['HIGH']
+    if(if_ce):
+        options = [f'BANKNIFTY{yy}{mdd_next_week}{x}CE' for x in range(atm, high, 100)]
+        insts.extend(options)
+    if(if_pe):
+        options = [f'BANKNIFTY{yy}{mdd_next_week}{x}PE' for x in range(low, atm, 100)]
+        insts.extend(options)
+
+
+    mmm_current_month = f'{today.strftime("%b").upper()}'
+    if(strikes['CURRENT_MONTH']['ALL']):
+        low = atm - 40 * 100
+        high = atm + 40 * 100
+    else:
+        low = strikes['CURRENT_MONTH']['LOW']
+        high = strikes['CURRENT_MONTH']['HIGH']
+    if(if_ce):
+        options = [f'BANKNIFTY{yy}{mmm_current_month}{x}CE' for x in range(atm, high, 100)]
+        insts.extend(options)
+    if(if_pe):
+        options = [f'BANKNIFTY{yy}{mmm_current_month}{x}PE' for x in range(low, atm, 100)]
+        insts.extend(options)
 
     ltps = kite.ltp([f'NFO:{inst}' for inst in insts])
 
