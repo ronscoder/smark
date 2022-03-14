@@ -106,14 +106,11 @@ class Orderapi:
             print('Error in Order API')
             return
         kite = self.kite
-        symb = f'{exchange}:{tradingsymbol}'
-        ltp = kite.ltp(symb)[symb]['last_price']
-        # if(price_bought == 0):
-        #     last_price = kite.ltp(symb)[symb]['last_price']
-        # else:
-        #     last_price = price_bought
         stop_pc = float(getConfig('STOP_PC'))
         price = round((1 - stop_pc)*price_bought, 1)
+        
+        symb = f'{exchange}:{tradingsymbol}'
+        ltp = kite.ltp(symb)[symb]['last_price']
         if(ltp < price):
             print(f'cannot set SL at {price} since ltp is {ltp}. setting wrt ltp...')
             price = round((1 - stop_pc)*ltp, 1)

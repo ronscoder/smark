@@ -21,7 +21,7 @@ def place_orders(direction):
         return
     # market window
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    if(not (datetime.time(hour=9, minute=15) < timestamp.time() < datetime.time(hour=15, minute=0))):
+    if(not (datetime.time(hour=9, minute=20) < timestamp.time() < datetime.time(hour=15, minute=5))):
         print('Outside market time window')
         logging.info('Outside market time window')
         return
