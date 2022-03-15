@@ -28,6 +28,7 @@ def action(channel, data):
     slorder = position['COUNTER_SL_ORDER']
     if(slorder == None):
         print('ERROR', 'NO SL SELL ORDER!')
+        return
     stoploss = slorder['price']
     base_price = price_bought if price_bought > stoploss else stoploss
     increment = math.floor(base_price * getConfig('TRAIL_PC'))
