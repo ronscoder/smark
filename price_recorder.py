@@ -15,6 +15,7 @@ class OHLC:
         self.open = None
         self.close = None
         self.history = []
+        self.interval = p1.get('OHLC_MIN')
 
     def feed(self, tick):
         now = datetime.datetime.now()
@@ -23,7 +24,7 @@ class OHLC:
             self.dt = now
             self.high = self.low = self.open = self.close = ltp
         else:
-            if(now > self.dt + datetime.timedelta(minutes=5)):
+            if(now > self.dt + datetime.timedelta(minutes=self.interval)):
                 self.history.append({
                     'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close})
                 self.dt = None
