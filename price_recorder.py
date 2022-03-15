@@ -15,7 +15,7 @@ class OHLC:
         self.open = None
         self.close = None
         self.history = []
-        self.interval = p1.get('OHLC_MIN')
+        self.interval = getConfig('OHLC_MIN')
 
     def feed(self, tick):
         now = datetime.datetime.now()
