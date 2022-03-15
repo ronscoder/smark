@@ -41,9 +41,9 @@ def calculate(channel, data):
         extremas[minid] = -1
 
     print('Closes[-2]-[-1]', ltp_change_pc)
-    if(1 in extremas[-interval*2:]):
+    if((1 in extremas[-3:]) and not (-1 in extremas[-3:])):
         direction = -1
-    elif(-1 in extremas[-interval*2:]):
+    elif((-1 in extremas[-3:]) and not (1 in extremas[-3:])):
         direction = 1
     # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
     #     #: Trending
