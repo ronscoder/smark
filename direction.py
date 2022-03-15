@@ -29,7 +29,7 @@ def calculate(channel, data):
     ltp_change_pc = (ltp - closes[-2])/closes[-2]*100
 
     #max min
-    ys = np.array([x['Close'] for x in closes])
+    ys = np.array(closes)
     maxids = argrelextrema(ys, np.greater, order=order, mode='wrap')[0]
     minids = argrelextrema(ys, np.less, order=order, mode='wrap')[0]
     # maxs = [(x, data[x]) for x in maxids]
