@@ -45,8 +45,9 @@ def action(channel, data):
             position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss
             position['COUNTER_SL_ORDER']['price'] = newstoploss
             p1.set('CURRENT_BUY_ORDER', position)
-        except:
-            pass
+        except Exception as ex:
+            print('Error modifying SL Sell order')
+            print(ex.__str__())
 
 if(__name__=='__main__'):
     print('running trail SL...')
