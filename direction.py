@@ -30,8 +30,8 @@ def calculate(channel, data):
 
     #max min
     ys = np.array(closes)
-    maxids = argrelextrema(ys, np.greater, order=order, mode='wrap')[0]
-    minids = argrelextrema(ys, np.less, order=order, mode='wrap')[0]
+    maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
+    minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
     # maxs = [(x, data[x]) for x in maxids]
     # mins = [(x, data[x]) for x in minids]
     extremas = [0]*len(data)
