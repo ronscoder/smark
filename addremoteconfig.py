@@ -24,7 +24,7 @@ configs = dict(
 # STRIKE_LIMIT=1000,
 # DURATION_OPEN_POSITION_MIN=120.0,
 # OPEN_ORDER_EXPIRY_MIN=7,
-EXTREMA_ORDER= 5
+EXTREMA_WINDOW= 2
 )
 
 db = firestore.client()

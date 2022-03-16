@@ -17,6 +17,7 @@ def calculate(channel, data):
     ma_periods = configs['MA_PERIODS']
     order = configs['EXTREMA_ORDER']
     interval = configs['OHLC_MIN']
+    extrema_window = configs['EXTREMA_WINDOW']
     closes = [d['close'] for d in data]
     # opens = [d['open'] for d in data]
     mashort = mva(min(ma_periods), closes)
@@ -42,9 +43,9 @@ def calculate(channel, data):
 
     print('Closes[-2]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
-        if((1 in extremas[-2:]) and not (-1 in extremas[-3:])):
+        if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
             direction = -1
-        elif((-1 in extremas[-2:]) and not (1 in extremas[-3:])):
+        elif((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
             direction = 1
     # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
     #     #: Trending
