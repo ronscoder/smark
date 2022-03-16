@@ -12,7 +12,7 @@ p1 = get_ps_1()
 
 datap = p1.get('HISTORY_260105')
 
-datap = datap[:-len([x for x in datap if x['close']==x['open']])][:-12]
+# datap = datap[:-len([x for x in datap if x['close']==x['open']])][:-12]
 # import pdb
 # pdb.set_trace()
 
@@ -40,7 +40,7 @@ plot(ax1, data)
 ys = np.array([x['Close'] for x in data])
 # ys = pd.Series([x['Close'] for x in data])
 # while True:
-order = 10
+order = 8
 # order = int(input('Order: '))
 # if(order == 0):
 #     break;
@@ -53,5 +53,18 @@ mn = min(ys)
 ax1.vlines(maxids, mn, mx, colors='green')
 ax1.vlines(minids, mn, mx, colors='red')
     # plt.pause(0.05)
+extremas = [0]*len(data)
+for maxid in maxids:
+    extremas[maxid] = 1
+for minid in minids:
+    extremas[minid] = -1
+    
+direction = None
+if((1 in extremas[-3:]) and not (-1 in extremas[-3:])):
+    direction = -1
+elif((-1 in extremas[-3:]) and not (1 in extremas[-3:])):
+    direction = 1  
+
+print(direction)  
 plt.show()
 # pdb.set_trace()
