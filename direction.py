@@ -19,7 +19,7 @@ def calculate(channel, data):
     interval = configs['OHLC_MIN']
     extrema_window = configs['EXTREMA_WINDOW']
     closes = [d['close'] for d in data]
-    # opens = [d['open'] for d in data]
+    opens = [d['open'] for d in data]
     mashort = mva(min(ma_periods), closes)
     malong = mva(max(ma_periods), closes)
     ltp = closes[-1]
@@ -27,7 +27,7 @@ def calculate(channel, data):
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
 
     direction = None
-    ltp_change_pc = (ltp - closes[-2])/closes[-2]*100
+    ltp_change_pc = (ltp - opens[-2])/opens[-2]*100
 
     #max min
     ys = np.array(closes)
