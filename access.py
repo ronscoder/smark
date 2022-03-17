@@ -2,6 +2,7 @@ import datetime
 import webbrowser
 from kiteconnect import KiteConnect
 from libs.configs import getConfig, setConfig
+import subprocess
 # from boto.s3.connection import S3Connection
 import os
 
@@ -22,6 +23,8 @@ def get_new_token(request_token=None):
         access_token = data['access_token']
         val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
         setConfig('ACCESS_TOKEN', val)
+        if('ON_HEROKU' in os.environ):
+            subprocess.run(["heroku", "config:set", f"ACCESS_TOKEN={access_token}"])
         print('new access token', val)
         # os.environ['ACCESS_TOKEN'] = val
         return access_token
