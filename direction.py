@@ -40,7 +40,7 @@ def calculate(channel, data):
         extremas[maxid] = 1
     for minid in minids:
         extremas[minid] = -1
-
+    print('extremas', extremas)
     print('Closes[-2]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
         if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
