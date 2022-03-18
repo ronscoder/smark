@@ -85,3 +85,15 @@ if(__name__ == '__main__'):
     ysymbols = {260105: '^NSEBANK'}
     dayhistories = DayHistories(tokens, ysymbols)
     p1.subscribe([f'TICK_{token}' for token in tokens], cb=dayhistories.record)
+'''
+{'tradable': True, 'mode': 'full', 'instrument_token': 12334338, 'last_price': 103.7, 'last_traded_quantity': 25, 'average_traded_price': 126.94, 'volume_traded': 3153975, 'total_buy_quantity': 87775, 'total_sell_quantity': 93625, 
+'ohlc': {'open': 91.0, 'high': 154.1, 'low': 91.0, 'close': 85.3}, 
+'change': 21.570926143024625, 'last_trade_time': datetime.datetime(2022, 3, 16, 10, 38, 29), 
+'oi': 491050, 'oi_day_high': 491050, 'oi_day_low': 321500, 'exchange_timestamp': datetime.datetime(2022, 3, 16, 10, 38, 29), 
+
+
+'depth': 
+{'buy': [{'quantity': 250, 'price': 103.65, 'orders': 2}, {'quantity': 25, 'price': 103.6, 'orders': 1}, {'quantity': 50, 'price': 103.55, 'orders': 1}, {'quantity': 575, 'price': 103.5, 'orders': 3}, {'quantity': 125, 'price': 103.45, 'orders': 2}], 
+
+'sell': [{'quantity': 25, 'price': 103.95, 'orders': 1}, {'quantity': 225, 'price': 104.0, 'orders': 2}, {'quantity': 25, 'price': 104.05, 'orders': 1}, {'quantity': 625, 'price': 104.1, 'orders': 4}, {'quantity': 400, 'price': 104.15, 'orders': 3}]}}
+'''

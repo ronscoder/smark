@@ -23,8 +23,10 @@ def get_new_token(request_token=None):
         access_token = data['access_token']
         val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
         setConfig('ACCESS_TOKEN', val)
+        print('os.environ', os.environ)
         if('ON_HEROKU' in os.environ):
-            subprocess.run(["heroku", "config:set", f"ACCESS_TOKEN={access_token}"])
+            os.environ['ACCESS_TOKEN'] = val
+            # subprocess.run(["heroku", "config:set", f"ACCESS_TOKEN={access_token}"])
         print('new access token', val)
         # os.environ['ACCESS_TOKEN'] = val
         return access_token
