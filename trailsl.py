@@ -34,7 +34,7 @@ def action(channel, data):
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
     # if time of hold is greater than certain duration, and exit.
     configs = getConfigs()
-    order_time = position['order_timestamp']
+    order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
     now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     timepast = now.replace(tzinfo=None) - order_time
     exit_time = configs['OPEN_ORDER_EXPIRY_MIN']*2
