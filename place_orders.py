@@ -63,6 +63,7 @@ def action(channel, data):
     'Change price and trigger for open buy orders'
     print('PLACE ORDERS checking...')
     oorders = orderapi.get_open_orders()
+    obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
     if(len(oorders) == 0):
         #=> there is no open sell orders
         print('There is no position.', 'Placing order...')
@@ -72,25 +73,26 @@ def action(channel, data):
             print('Error placing orders')
             print(ex.__str__())
         return
-    now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    expiry_min = getConfig('OPEN_ORDER_EXPIRY_MIN')
-    obuyorders = [x for x in oorders if x['transaction_type']=='BUY']
-    if(len(obuyorders) > 0):
-        print('There are open buy orders', len(obuyorders))
-        for order in obuyorders:
-            order_time = order['order_timestamp']
-            timepast = now.replace(tzinfo=None) - order_time
-            if(timepast > datetime.timedelta(minutes=expiry_min)):
-                print('Changing open buy order triggers')
-                price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
-                price_range = getConfig('OPTION_PRICE_RANGE')
-                if(price in price_range):
-                    print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
-                    orderapi.modify_sl_order(order['order_id'], price, trigger)
-                else:
+    else:
+        if(len(obuyorders)>0):
+            print('There are open buy orders', len(obuyorders))
+            now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+            expiry_min = getConfig('OPEN_ORDER_EXPIRY_MIN')
+            for order in obuyorders:
+                if((order['tradingsymbol'][:-2]=='CE' and direction==-1) or (order['tradingsymbol'][:-2]=='PE' and direction==1)):
+                    print('Direction reversed. Cancelling open buy orders')
+                    orderapi.cancel_open_buy_orders()
+                    continue
+                order_time = order['order_timestamp']
+                timepast = now.replace(tzinfo=None) - order_time
+                if(timepast > datetime.timedelta(minutes=expiry_min)):
                     print('Canceling expired open buy orders', expiry_min)
                     orderapi.cancel_open_buy_orders()
-            # elif(timepast > datetime.timedelta(minutes=round(expiry_min/2))):
+                elif(timepast > datetime.timedelta(minutes=round(expiry_min/2-2))):
+                    print('Changing open buy order triggers')
+                    price, trigger = orderapi.get_buy_sl_prices(order['tradingsymbol'], order['exchange'])
+                    print(order['tradingsymbol'], 'new price', f'{price}/{trigger}')
+                    orderapi.modify_sl_order(order['order_id'], price, trigger)
 
 if(__name__ == '__main__'):
     print('Place order started')

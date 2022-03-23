@@ -68,7 +68,7 @@ for maxid in maxids:
     extremas[maxid] = 1
 for minid in minids:
     extremas[minid] = -1
-    
+print(extremas)
 direction = None
 if((1 in extremas[-3:]) and not (-1 in extremas[-3:])):
     direction = -1
