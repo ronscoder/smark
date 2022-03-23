@@ -31,15 +31,16 @@ def action(channel, data):
         return
     stoploss = slorder['price']
     base_price = price_bought if price_bought > stoploss else stoploss
-    increment = math.floor(base_price * getConfig('TRAIL_PC'))
-    newstoploss = base_price + increment
+    # increment = math.floor(base_price * getConfig('TRAIL_PC'))
+    trigger = base_price + base_price * getConfig('TRAIL_BUFFER_PC')
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
-    print('trail SL', tradingsymbol, 'base price', base_price, 'new stoploss',newstoploss, 'ltp', ltp)
-    if(ltp > (newstoploss + ltp*getConfig('TRAIL_BUFFER_PC'))):
-        unit_pl = ltp - base_price
-        factor = unit_pl//increment
-        newstoploss = base_price + increment * factor
-        print(f'{tradingsymbol} set new stoploss from {base_price} -> {newstoploss}')
+    print('trail SL', tradingsymbol, 'base price', base_price, 'new trigger',trigger, 'ltp', ltp)
+    if(ltp > trigger):
+        newstoploss = trigger*getConfig('TRAIL_PC')
+        # unit_pl = ltp - base_price
+        # factor = unit_pl//increment
+        # newstoploss = base_price + increment * factor
+        print(f'{tradingsymbol} set new stoploss from {base_price} -> {newstoploss}->{trigger}')
         try:
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=newstoploss, trigger=newstoploss)
             position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss

@@ -7,10 +7,20 @@ from libs.tools import mva
 # import pandas as pd
 from scipy.signal import argrelextrema
 import numpy as np
+import pickle
+import datetime
+import os
 
 p1 = get_ps_1()
 
-datap = p1.get('HISTORY_260105')
+file = f'temp/HISTORY_260105_{datetime.datetime.now().__str__()}'
+if(os.path.exists(file)):
+    with open(file, 'rb') as f:
+        datap = pickle.load(f)
+else:
+    datap = p1.get('HISTORY_260105')
+    with open(file, 'wb') as f:
+        pickle.dump(datap, f)
 
 # datap = datap[:-len([x for x in datap if x['close']==x['open']])][:-12]
 # import pdb
@@ -40,7 +50,7 @@ plot(ax1, data)
 ys = np.array([x['Close'] for x in data])
 # ys = pd.Series([x['Close'] for x in data])
 # while True:
-order = 8
+order = 18
 # order = int(input('Order: '))
 # if(order == 0):
 #     break;
