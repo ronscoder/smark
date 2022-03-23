@@ -36,7 +36,7 @@ def action(channel, data):
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('trail SL', tradingsymbol, 'base price', base_price, 'new trigger',trigger, 'ltp', ltp)
     if(ltp > trigger):
-        newstoploss = trigger*getConfig('TRAIL_PC')
+        newstoploss = round(trigger*getConfig('TRAIL_PC'),1)
         # unit_pl = ltp - base_price
         # factor = unit_pl//increment
         # newstoploss = base_price + increment * factor
