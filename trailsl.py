@@ -1,8 +1,8 @@
 from libs.pubsub import get_ps_1
-from libs.configs import getConfig
-import math
+from libs.configs import getConfig, getConfigs
 from libs.orderapi import Orderapi
-
+import datetime
+from zoneinfo import ZoneInfo
 
 p1 = get_ps_1()
 orderapi = Orderapi()
@@ -32,11 +32,23 @@ def action(channel, data):
     stoploss = slorder['price']
     base_price = price_bought if price_bought > stoploss else stoploss
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
-    trigger = base_price + base_price * getConfig('TRAIL_BUFFER_PC')
+    # if time of hold is greater than certain duration, and exit.
+    configs = getConfigs()
+    order_time = position['order_timestamp']
+    now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    timepast = now.replace(tzinfo=None) - order_time
+    exit_time = configs['OPEN_ORDER_EXPIRY_MIN']*2
+    if(timepast >= exit_time):
+        if(ltp >= base_price):
+            orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=round(ltp,1)-1, trigger=round(ltp,1)-1)
+        else:
+            orderapi.exit_position_market(order_id=position['COUNTER_SL_ORDER']['order_id'])
+        return
+    trigger = base_price + base_price * configs['TRAIL_BUFFER_PC']
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
-    print('trail SL', tradingsymbol, 'base price', base_price, 'new trigger',trigger, 'ltp', ltp)
+    print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
     if(ltp > trigger):
-        newstoploss = round(trigger*getConfig('TRAIL_PC'),1)
+        newstoploss = round(trigger*configs['TRAIL_PC'],1)
         # unit_pl = ltp - base_price
         # factor = unit_pl//increment
         # newstoploss = base_price + increment * factor
@@ -49,6 +61,9 @@ def action(channel, data):
         except Exception as ex:
             print('Error modifying SL Sell order')
             print(ex.__str__())
+    else:
+        
+        pass
 
 if(__name__=='__main__'):
     print('running trail SL...')

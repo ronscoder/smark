@@ -79,6 +79,16 @@ class Orderapi:
             return
         self.kite.modify_order(**params)
 
+    def exit_position_market(self, order_id):
+        params = dict(variety=KC.VARIETY_REGULAR, order_id=order_id,
+                      order_type=KC.ORDER_TYPE_MARKET)
+        # logging.info('modifying SL order')
+        # logging.info(params)
+        if(self.kite is None):
+            print('Error in Order API')
+            return
+        self.kite.modify_order(**params)
+
     def position_scheduler(self):
         s = sched.scheduler(time.time, time.sleep)
         s.enter(getConfig('OPEN_ORDER_EXPIRY_MIN')*60,
