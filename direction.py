@@ -30,12 +30,12 @@ def calculate(channel, data):
     ltp_change_pc = (ltp - opens[-2])/opens[-2]*100
 
     #max min
-    Yw = np.fft.rfft(closes)
-    print('number of frequencies', len(Yw))
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     if(freqfact == 0.0):
         ys = np.array(closes)
     else:
+        Yw = np.fft.rfft(closes)
+        print('number of frequencies', len(Yw))
         Yw[round(len(Yw)/freqfact):] = 0
         ys = np.fft.irfft(Yw, len(closes))
     maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
