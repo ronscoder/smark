@@ -98,14 +98,13 @@ closes = [x['Close'] for x in data]
 #     yss.append(opens[i])
 #     yss.append(closes[i])
 # ys = np.array(closes)
-Yw = np.fft.rfft(closes)
-Yw[9:] = 0
-ys = np.fft.irfft(Yw, len(closes))
-
 order = 18
-# order = int(input('Order: '))
-# if(order == 0):
-#     break;
+
+Yw = np.fft.rfft(closes)
+Yw[40:] = 0
+ys = np.fft.irfft(Yw, len(closes))
+# print(len(Yw), len(ys), len(closes))
+# ys = np.array(closes)
 ax1.plot(ys, color='yellow')
 maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
 minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
