@@ -30,7 +30,10 @@ def calculate(channel, data):
     ltp_change_pc = (ltp - opens[-2])/opens[-2]*100
 
     #max min
-    ys = np.array(closes)
+    Yw = np.fft.rfft(closes)
+    Yw[round(order/2):] = 0
+    # ys = np.array(closes)
+    ys = np.fft.irfft(Yw, len(closes))
     maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
     minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
     # maxs = [(x, data[x]) for x in maxids]
@@ -43,9 +46,9 @@ def calculate(channel, data):
     print('extremas', extremas)
     print('Closes[-2]-[-1]', ltp_change_pc)
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
-        if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
+        if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and (ltp_change_pc < 0)):
             direction = -1
-        elif((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
+        elif((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and (ltp_change_pc > 0)):
             direction = 1
     # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
     #     #: Trending

@@ -37,7 +37,7 @@ def action(channel, data):
     order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
     now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     timepast = now.replace(tzinfo=None) - order_time
-    exit_time = configs['OPEN_ORDER_EXPIRY_MIN']*2
+    exit_time = datetime.timedelta(minutes=configs['OPEN_ORDER_EXPIRY_MIN']*2)
     if(timepast >= exit_time):
         if(ltp >= base_price):
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=round(ltp,1)-1, trigger=round(ltp,1)-1)
@@ -48,7 +48,7 @@ def action(channel, data):
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
     if(ltp > trigger):
-        newstoploss = round(trigger*configs['TRAIL_PC'],1)
+        newstoploss = round(trigger*configs['TRAIL_RATIO'],1)
         # unit_pl = ltp - base_price
         # factor = unit_pl//increment
         # newstoploss = base_price + increment * factor

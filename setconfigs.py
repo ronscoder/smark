@@ -2,7 +2,7 @@
 from libs.configs import getConfigs, setConfigs
 
 CONFIGS = {
-    'TRAIL_PC': 0.05,
+    'TRAIL_RATIO': 0.6,
     'TRAIL_BUFFER_PC': 0.03,
     'ENTRY_STOP_PC': 0.2,
     'STOP_PC': 0.08,
