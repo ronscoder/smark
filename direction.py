@@ -31,7 +31,7 @@ def calculate(channel, data):
 
     #max min
     Yw = np.fft.rfft(closes)
-    print('number of frequencies', Yw)
+    print('number of frequencies', len(Yw))
     Yw[round(len(Yw)/configs['FREQ_CUTOFF_FACTOR']):] = 0
     # ys = np.array(closes)
     ys = np.fft.irfft(Yw, len(closes))
