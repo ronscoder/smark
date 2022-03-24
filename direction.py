@@ -32,9 +32,12 @@ def calculate(channel, data):
     #max min
     Yw = np.fft.rfft(closes)
     print('number of frequencies', len(Yw))
-    Yw[round(len(Yw)/configs['FREQ_CUTOFF_FACTOR']):] = 0
-    # ys = np.array(closes)
-    ys = np.fft.irfft(Yw, len(closes))
+    freqfact = configs['FREQ_CUTOFF_FACTOR']
+    if(freqfact == 0.0):
+        ys = np.array(closes)
+    else:
+        Yw[round(len(Yw)/freqfact):] = 0
+        ys = np.fft.irfft(Yw, len(closes))
     maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
     minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
     # maxs = [(x, data[x]) for x in maxids]

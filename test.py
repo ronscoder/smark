@@ -14,10 +14,12 @@ import os
 p1 = get_ps_1()
 
 file = f'temp/HISTORY_260105_{datetime.datetime.now().month}{datetime.datetime.now().day}'
+datap = None
 if(os.path.exists(file)):
-    with open(file, 'rb') as f:
-        datap = pickle.load(f)
-else:
+    if(input('Reuse data? ') == 'y'):
+        with open(file, 'rb') as f:
+            datap = pickle.load(f)
+if(datap == None):
     datap = p1.get('HISTORY_260105')
     with open(file, 'wb') as f:
         pickle.dump(datap, f)
@@ -99,9 +101,14 @@ closes = [x['Close'] for x in data]
 #     yss.append(closes[i])
 # ys = np.array(closes)
 order = 18
+smooth_factorx = input('smooth factor 1?')
+if(smooth_factorx == ''):
+    smooth_factor = 1.0
+else:
+    smooth_factor = float(smooth_factorx)
 
 Yw = np.fft.rfft(closes)
-Yw[40:] = 0
+Yw[round(len(Yw)/smooth_factor):] = 0
 ys = np.fft.irfft(Yw, len(closes))
 # print(len(Yw), len(ys), len(closes))
 # ys = np.array(closes)
