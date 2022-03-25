@@ -19,9 +19,10 @@ class PubSub:
         # self.r = redis.Redis(db=db)
         # self.r = redis.Redis(host='ec2-52-54-47-158.compute-1.amazonaws.com', port=29680, db=db, password='p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf')
         # self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-52-54-47-158.compute-1.amazonaws.com:29679', db=db)
-        self.r = redis.from_url(os.environ['REDIS_URL'], db=db)
-        # self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-34-202-133-28.compute-1.amazonaws.com:15709', db=db)
-        # self.r = redis.from_url(os.environ.get("REDIS_URL"))
+        if('ON_HEROKU' in os.environ):
+            self.r = redis.from_url(os.environ['REDIS_URL'], db=db)
+        else:
+            self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-34-202-133-28.compute-1.amazonaws.com:15709', db=db)
         self.ps = self.r.pubsub()
 
     def set(self, key, data):
