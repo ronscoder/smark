@@ -18,7 +18,8 @@ class PubSub:
     def __init__(self, db=0) -> None:
         # self.r = redis.Redis(db=db)
         # self.r = redis.Redis(host='ec2-52-54-47-158.compute-1.amazonaws.com', port=29680, db=db, password='p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf')
-        self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-52-54-47-158.compute-1.amazonaws.com:29679', db=db)
+        # self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-52-54-47-158.compute-1.amazonaws.com:29679', db=db)
+        self.r = redis.from_url(os.environ['REDIS_URL'], db=db)
         # self.r = redis.from_url(os.environ.get("REDIS_URL"))
         self.ps = self.r.pubsub()
 
