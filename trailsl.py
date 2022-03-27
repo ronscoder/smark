@@ -56,9 +56,9 @@ def action(channel, data):
         print(f'{tradingsymbol} set new stoploss from {base_price} -> {newstoploss}->{trigger}')
         try:
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=newstoploss, trigger=newstoploss)
-            position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss
-            position['COUNTER_SL_ORDER']['price'] = newstoploss
-            p1.set('CURRENT_BUY_ORDER', position)
+            # position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss
+            # position['COUNTER_SL_ORDER']['price'] = newstoploss
+            # p1.set('CURRENT_BUY_ORDER', position)
         except Exception as ex:
             print('Error modifying SL Sell order')
             print(ex.__str__())
