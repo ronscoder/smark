@@ -101,15 +101,18 @@ closes = [x['Close'] for x in data]
 #     yss.append(closes[i])
 # ys = np.array(closes)
 order = 18
-smooth_factorx = input('smooth factor 1?')
-if(smooth_factorx == ''):
-    smooth_factor = 1.0
+freqfact = float(input('smooth factor 0?'))
+if(freqfact == 0.0):
+    ys = np.array(closes)
 else:
-    smooth_factor = float(smooth_factorx)
+    Yw = np.fft.rfft(closes)
+    print('number of frequencies', len(Yw))
+    Yw[round(len(Yw)/freqfact):] = 0
+    ys = np.fft.irfft(Yw, len(closes))
 
-Yw = np.fft.rfft(closes)
-Yw[round(len(Yw)/smooth_factor):] = 0
-ys = np.fft.irfft(Yw, len(closes))
+# Yw = np.fft.rfft(closes)
+# Yw[round(len(Yw)/smooth_factor):] = 0
+# ys = np.fft.irfft(Yw, len(closes))
 # print(len(Yw), len(ys), len(closes))
 # ys = np.array(closes)
 ax1.plot(ys, color='yellow')

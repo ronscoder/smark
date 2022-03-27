@@ -71,6 +71,7 @@ class DayHistories:
                                     enddate=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
                 self.day_histories[token].history = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
                                                         'close': ohlc['Close']} for r, ohlc in ydata.iterrows()]
+                p1.publish(f'HISTORY_{token}', self.day_histories[token].history)
 
     def record(self, channel, data):
         # print(channel, data)
