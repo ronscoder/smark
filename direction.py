@@ -1,4 +1,4 @@
-from matplotlib.pyplot import close
+
 from libs.pubsub import get_ps_1
 from libs.tools import mva
 from libs.configs import getConfigs
