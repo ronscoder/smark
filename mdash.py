@@ -60,7 +60,7 @@ def getgraph(symbol):
         #               y1=last_price, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
 
     fig.update_layout(title_text=symbol)
-    fig.update_xaxes(range=[0, 80])
+    # fig.update_xaxes(range=[0, 80])
     return html.Div([dcc.Graph(id='graph1', figure=fig),
                      *divs
                      ])

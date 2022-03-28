@@ -35,16 +35,17 @@ def action(channel, data):
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
     # if time of hold is greater than certain duration, and exit.
     configs = getConfigs()
-    order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
-    now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    timepast = now.replace(tzinfo=None) - order_time
-    exit_time = datetime.timedelta(minutes=configs['OPEN_ORDER_EXPIRY_MIN']*2)
-    if(timepast >= exit_time):
-        if(stoploss < price_bought):
-            orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=round(ltp,1)-1, trigger=round(ltp,1)-1)
+    # order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
+    # now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    # timepast = now.replace(tzinfo=None) - order_time
+    # exit_time = datetime.timedelta(minutes=configs['OPEN_ORDER_EXPIRY_MIN']*2)
+    # if(timepast >= exit_time):
+        # if(stoploss < price_bought):
+            # pass
+            # orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=round(ltp,1)-1, trigger=round(ltp,1)-1)
         # else:
-        #     orderapi.exit_position_market(order_id=position['COUNTER_SL_ORDER']['order_id'])
-        return
+            # orderapi.exit_position_market(order_id=position['COUNTER_SL_ORDER']['order_id'])
+        # return
     trigger = base_price + base_price * configs['TRAIL_BUFFER_PC']
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
