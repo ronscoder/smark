@@ -64,11 +64,13 @@ def calculate(channel, data):
             direction = 1
         #breakdown
         extremas_vi = [(v, closes[i]) for i,v in enumerate(extremas)]
-        last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
-        if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
-            direction = -1
-        elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
-            direction = 1
+        filtered = [(v,x) for (v,x) in extremas_vi if v!=0]
+        if(len(filtered)>0):
+            last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
+            if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
+                direction = -1
+            elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
+                direction = 1
 
     print('BANKNIFTY_DIRECTION', direction)
     ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas})
