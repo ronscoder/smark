@@ -1,4 +1,5 @@
 
+import enum
 from libs.pubsub import get_ps_1
 from libs.tools import mva
 from libs.configs import getConfigs
@@ -41,8 +42,8 @@ def calculate(channel, data):
     extrema_window = configs['EXTREMA_WINDOW']
     closes = [d['close'] for d in data]
     opens = [d['open'] for d in data]
-    mashort = mva(min(ma_periods), closes)
-    malong = mva(max(ma_periods), closes)
+    # mashort = mva(min(ma_periods), closes)
+    # malong = mva(max(ma_periods), closes)
     ltp = closes[-1]
     # ftp = opens[-1]
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
@@ -54,28 +55,21 @@ def calculate(channel, data):
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas = get_extremas(closes, freqfact, order)
     print('Closes[-2]-[-1]', ltp_change_pc)
+
     if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
+        #reversal
         if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and (ltp_change_pc < 0)):
             direction = -1
         elif((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and (ltp_change_pc > 0)):
             direction = 1
-    # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
-    #     #: Trending
-    #     if(ltp > mashort.iloc[-1] > malong.iloc[-1]):
-    #         direction = 1
-    #     elif(ltp < mashort.iloc[-1] < malong.iloc[-1]):
-    #         direction = -1
-        
-    #     #: Reversal
-    #     if(direction == None):
-    #         if(mashort.iloc[-1] < malong.iloc[-1]):
-    #             cond = ltp > malong.iloc[-1]
-    #             if(cond):
-    #                 direction = 1
-    #         elif(mashort.iloc[-1] > malong.iloc[-1]):
-    #             cond = ltp < malong.iloc[-1]
-    #             if(cond):
-    #                 direction = -1
+        #breakdown
+        extremas_vi = [(v, closes[i]) for i,v in enumerate(extremas)]
+        last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
+        if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
+            direction = -1
+        elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
+            direction = 1
+
     print('BANKNIFTY_DIRECTION', direction)
     ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas})
 
