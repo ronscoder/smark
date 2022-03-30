@@ -30,8 +30,8 @@ def action(channel, data):
         print('ERROR', 'NO SL SELL ORDER!')
         return
     stoploss = slorder['price']
-    # base_price = price_bought if price_bought > stoploss else stoploss
-    base_price = stoploss
+    base_price = price_bought if price_bought > stoploss else stoploss
+    # base_price = stoploss
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
     # if time of hold is greater than certain duration, and exit.
     configs = getConfigs()
