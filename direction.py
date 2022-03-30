@@ -49,7 +49,7 @@ def calculate(channel, data):
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
 
     direction = None
-    ltp_change_pc = (ltp - opens[-2])/opens[-2]*100
+    ltp_change_pc = (ltp - opens[-extrema_window])/opens[-extrema_window]*100
 
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
