@@ -18,21 +18,21 @@ class Orderapi:
     def get_open_orders(self):
         if(self.kite is None):
             print('Error in Order API')
-            return
+            return []
         orders = self.kite.orders()
         return [x for x in orders if x['status'] == 'TRIGGER PENDING']
 
     def get_open_buy_orders(self):
         if(self.kite is None):
             print('Error in Order API')
-            return
+            return []
         orders = self.kite.orders()
         return [x for x in orders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
 
     def get_open_sell_orders(self):
         if(self.kite is None):
             print('Error in Order API')
-            return
+            return []
         orders = self.kite.orders()
         return [x for x in orders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']
 
