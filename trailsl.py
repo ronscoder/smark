@@ -13,28 +13,26 @@ def action(channel, data):
     if(instrument_token == nifty_token):
         return
     print('checking tick for new TRAIL')
+    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    if(timestamp.time() > datetime.time(hour=15, minute=15)):
+        orderapi.exit_all_positions()
+        return    
     position = p1.get('CURRENT_BUY_ORDER')
-    
     if(position == None):
         return
-
     tradingsymbol = position['tradingsymbol']
     instrument_token = position['instrument_token']
     if(not channel == f'TICK_{instrument_token}'):
         return
     # print('trail SL check. position', tradingsymbol)
-    ltp = data['last_price']
     price_bought = position['price']
     slorder = position['COUNTER_SL_ORDER']
     if(slorder == None):
         print('ERROR', 'NO SL SELL ORDER!')
         return
-    stoploss = slorder['price']
     # base_price = price_bought if price_bought > stoploss else stoploss
-    base_price = stoploss
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
     # if time of hold is greater than certain duration, and exit.
-    configs = getConfigs()
     # order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
     # now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     # timepast = now.replace(tzinfo=None) - order_time
@@ -46,7 +44,12 @@ def action(channel, data):
         # else:
             # orderapi.exit_position_market(order_id=position['COUNTER_SL_ORDER']['order_id'])
         # return
+    configs = getConfigs()   
+    stoploss = slorder['price']
+    # base_price = stoploss  
+    base_price = price_bought if price_bought > stoploss else stoploss       
     trigger = base_price + base_price * configs['TRAIL_BUFFER_PC']
+    ltp = data['last_price']
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
     if(ltp > trigger):
@@ -57,9 +60,6 @@ def action(channel, data):
         print(f'{tradingsymbol} set new stoploss from {base_price} -> {newstoploss}->{trigger}')
         try:
             orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=newstoploss, trigger=newstoploss)
-            # position['COUNTER_SL_ORDER']['trigger_price'] = newstoploss
-            # position['COUNTER_SL_ORDER']['price'] = newstoploss
-            # p1.set('CURRENT_BUY_ORDER', position)
         except Exception as ex:
             print('Error modifying SL Sell order')
             print(ex.__str__())

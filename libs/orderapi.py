@@ -109,6 +109,13 @@ class Orderapi:
             print('Error in Order API')
             return
         order_id = self.kite.place_order(**params)
+    
+    def exit_all_positions(self):
+        sell_orders = self.get_open_sell_orders()
+        for order in sell_orders:
+            params = dict(variety=KC.VARIETY_REGULAR, order_id=order['order_id'],
+                        order_type=KC.ORDER_TYPE_MARKET)
+            self.kite.modify_order(**params)
 
 
     def get_sell_sl_prices(self, tradingsymbol, exchange, price_bought):
