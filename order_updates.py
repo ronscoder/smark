@@ -1,4 +1,3 @@
-from place_orders import place_orders
 from libs.pubsub import get_ps_1
 from kiteconnect import KiteConnect as KC
 from libs.orderapi import Orderapi
