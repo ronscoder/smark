@@ -47,7 +47,7 @@ def place_orders():
         return [ce, pe]
 
 
-def action(data):
+def action(channcel, data):
     print('PLACE ORDERS checking...')
     oorders = orderapi.get_open_orders()
     if(len(oorders) == 0):
@@ -72,7 +72,7 @@ if(__name__ == '__main__'):
     t0.start()
     
     while(True):
-        action(True)
+        action(None, True)
         wait_min = getConfig('OHLC_MIN')
         time.sleep(wait_min*60)
     
