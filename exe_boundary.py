@@ -70,6 +70,6 @@ if(__name__ == '__main__'):
     while(True):
         action(True)
         wait_min = getConfig('OHLC_MIN')
-        time.sleep(wait_min)
+        time.sleep(wait_min*60)
     
 
