@@ -51,15 +51,24 @@ def action(data):
         print('There is no position.', 'Placing order...')
         try:
             insts = place_orders()
-            print(__name__, insts)
+            print('exe_boundary', insts)
         except Exception as ex:
             print('Error placing orders')
             print(ex.__str__())
     else:
         pass
 
+import threading
+def subscribe_pexit():
+    ps1.subscribe(['POSITION_EXITED'], action)
+
 if(__name__ == '__main__'):
     print('Place order started')
-    action(True)
-    ps1.subscribe(['POSITION_EXITED'], action)
+    t0 = threading.Thread(target=subscribe_pexit, daemon=True)
+    
+    while(True):
+        action(True)
+        wait_min = getConfig('OHLC_MIN')
+        time.sleep(wait_min)
+    
 
