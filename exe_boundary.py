@@ -32,15 +32,18 @@ def place_orders():
     inst_ce, inst_pe = set_options(if_ce=True, if_pe=True)
     time.sleep(2)
     try:
-        ce = inst_ce[0]
-        orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
-        time.sleep(2)
-        pe = inst_pe[0]
-        orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
+        if(not inst_ce is None):
+            ce = inst_ce[0]
+            orderapi.place_sl_buy_order(ce, getConfig('NIFTYBANK_QTY'), 'NFO')
+            time.sleep(2)
+        if(not inst_pe is None):
+            pe = inst_pe[0]
+            orderapi.place_sl_buy_order(pe, getConfig('NIFTYBANK_QTY'), 'NFO')
         return [ce, pe]
     except Exception as ex:
         print('Error placing orders')
         print(ex.__str__())
+        return [inst_ce, inst_pe]
 
 
 def action(data):
