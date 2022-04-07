@@ -26,10 +26,10 @@ def action(channel, data):
         return
     # print('trail SL check. position', tradingsymbol)
     price_bought = position['price']
-    slorder = position['COUNTER_SL_ORDER']
-    if(slorder == None):
+    if(not 'COUNTER_SL_ORDER' in position):
         print('ERROR', 'NO SL SELL ORDER!')
         return
+    slorder = position['COUNTER_SL_ORDER']
     # base_price = price_bought if price_bought > stoploss else stoploss
     # increment = math.floor(base_price * getConfig('TRAIL_PC'))
     # if time of hold is greater than certain duration, and exit.
