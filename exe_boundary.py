@@ -31,6 +31,7 @@ def place_orders():
     # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
     inst_ce, inst_pe = set_options(if_ce=True, if_pe=True)
     time.sleep(2)
+    ce = pe = None
     try:
         if(not inst_ce is None):
             ce = inst_ce[0]
@@ -43,7 +44,7 @@ def place_orders():
     except Exception as ex:
         print('Error placing orders')
         print(ex.__str__())
-        return [inst_ce, inst_pe]
+        return [ce, pe]
 
 
 def action(data):
