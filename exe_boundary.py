@@ -65,6 +65,7 @@ def subscribe_pexit():
 if(__name__ == '__main__'):
     print('Place order started')
     t0 = threading.Thread(target=subscribe_pexit, daemon=True)
+    t0.start()
     
     while(True):
         action(True)
