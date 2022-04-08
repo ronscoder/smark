@@ -87,7 +87,7 @@ def set_options(if_ce=True, if_pe=True):
         ltps = kite.ltp([f'NFO:{inst}' for inst in options])
         pe = filter_pe(ltps, price_range)
     # pdb.set_trace()
-    if(ce == pe == None):
+    if(None in [ce, pe]):
         next_thursday_2 = get_next_thursday_date(1)
         mdd_next_week = f'{today.month}{next_thursday_2.day:02}'
         if(strikes['NEXT_WEEK']['ALL']):
@@ -96,16 +96,16 @@ def set_options(if_ce=True, if_pe=True):
         else:
             low = strikes['NEXT_WEEK']['LOW']
             high = strikes['NEXT_WEEK']['HIGH']
-        if(if_ce):
+        if(if_ce and ce is None):
             options = [f'BANKNIFTY{yy}{mdd_next_week}{x}CE' for x in range(atm, high, 100)]
             ltps = kite.ltp([f'NFO:{inst}' for inst in options])
             ce = filter_ce(ltps, price_range)
-        if(if_pe):
+        if(if_pe and pe is None):
             options = [f'BANKNIFTY{yy}{mdd_next_week}{x}PE' for x in range(low, atm, 100)]
             ltps = kite.ltp([f'NFO:{inst}' for inst in options])
             pe = filter_pe(ltps, price_range)
     
-    if(ce == pe == None):
+    if(None in [ce, pe]):
         mmm_current_month = f'{today.strftime("%b").upper()}'
         if(strikes['CURRENT_MONTH']['ALL']):
             low = atm - 40 * 100
@@ -113,11 +113,11 @@ def set_options(if_ce=True, if_pe=True):
         else:
             low = strikes['CURRENT_MONTH']['LOW']
             high = strikes['CURRENT_MONTH']['HIGH']
-        if(if_ce):
+        if(if_ce and ce is None):
             options = [f'BANKNIFTY{yy}{mmm_current_month}{x}CE' for x in range(atm, high, 100)]
             ltps = kite.ltp([f'NFO:{inst}' for inst in options])
             ce = filter_ce(ltps, price_range)
-        if(if_pe):
+        if(if_pe and pe is None):
             options = [f'BANKNIFTY{yy}{mmm_current_month}{x}PE' for x in range(low, atm, 100)]
             ltps = kite.ltp([f'NFO:{inst}' for inst in options])
             pe = filter_pe(ltps, price_range)
