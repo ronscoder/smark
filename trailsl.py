@@ -48,7 +48,7 @@ def action(channel, data):
     stoploss = slorder['price']
     # base_price = stoploss  
     base_price = price_bought if price_bought > stoploss else stoploss       
-    trigger = base_price + base_price * configs['TRAIL_BUFFER_PC']
+    trigger = round(base_price + base_price * configs['TRAIL_BUFFER_PC'],1)
     ltp = data['last_price']
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
     print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
