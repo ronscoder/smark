@@ -48,8 +48,8 @@ def getgraph(symbol):
                 fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
                         y1=min(lows), line=dict(color='red' if direction==-1 else 'blue', width=2), row=1, col=1)
             if(extremas is not None):
-                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==1]
-                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==-1]
+                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==-1]
+                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==1]
                 for i,v in maximas:
                     fig.add_shape(type='line', x0=i-2, x1=i+2, y0=v,
                         y1=v, line=dict(color='red', width=2), row=1, col=1)
