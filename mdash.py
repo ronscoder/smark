@@ -42,7 +42,11 @@ def getgraph(symbol):
             # extremas = get_extremas(closes, freqfact, order)
             extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
             direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
-            print(direction, extremas)
+            print(direction, extremas[:-5])
+            if(not direction is None):
+                l = len(extremas)
+                fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
+                        y1=min(lows), line=dict(color='red' if direction==-1 else 'blue', width=2), row=1, col=1)
             if(extremas is not None):
                 maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==1]
                 minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==-1]
@@ -67,6 +71,7 @@ def getgraph(symbol):
 
 app.layout = html.Div(children=[
     html.Div('HISTORY_260105', id='txt-symbol', hidden=True),
+    html.Button('PAUSE', id='btn_pause'),
     dcc.Interval(id='refresher', interval=5*1000, disabled=False),
     html.Div([
         html.Div(id='contentdyn', className='p-4 flex-1 w-3/5 bg-gray-100'),
@@ -77,6 +82,18 @@ app.layout = html.Div(children=[
 
 def getPropId(ctx):
     return ctx.triggered[0]['prop_id'].split('.')[0]
+
+@ app.callback(Output('btn_pause', 'children'), Input('btn_pause', 'n_clicks'))
+def pause(n_clicks):
+    paused = r.get('PAUSED')
+    print(paused, n_clicks)
+    if(paused is None):
+        paused = False
+    if(n_clicks is None):
+        pass
+    else:
+        r.set('PAUSED', not paused)
+    return 'paused' if paused else 'pause'
 
 
 @ app.callback(Output('contentdyn', 'children'),

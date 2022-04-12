@@ -29,6 +29,9 @@ def place_orders():
     if(not getTruthsOf('GENERAL')):
         return
     # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
+    if(not getConfig('BOUNDARY_EXE')):
+        print('Boundary trade not activated')
+        return
     inst_ce, inst_pe = set_options(if_ce=True, if_pe=True)
     time.sleep(2)
     ce = pe = None

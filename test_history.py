@@ -20,5 +20,10 @@ if(datap == None):
 ohlcs = datap[:10]
 for ohlc in datap[11:]:
     ohlcs.append(ohlc)
+    paused = p1.get('PAUSED')
+    while(paused):
+        time.sleep(5)
+        print('paused')
+        paused = p1.get('PAUSED')            
     p1.publish(f'HISTORY_260105', ohlcs)
-    time.sleep(5)
+    time.sleep(2)

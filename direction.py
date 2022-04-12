@@ -26,9 +26,9 @@ def get_extremas(data, freqcutoff, order=12):
     # mins = [(x, data[x]) for x in minids]
     extremas = [0]*len(data)
     for maxid in maxids:
-        extremas[maxid] = 1
+        extremas[maxid] = -1
     for minid in minids:
-        extremas[minid] = -1
+        extremas[minid] = 1
     print('extremas', extremas)
     return extremas
 
@@ -56,21 +56,26 @@ def calculate(channel, data):
     extremas = get_extremas(closes, freqfact, order)
     print('Closes[-2]-[-1]', ltp_change_pc)
 
-    if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
-        #reversal
-        if((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and (ltp_change_pc < 0)):
-            direction = -1
-        elif((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and (ltp_change_pc > 0)):
-            direction = 1
-        #breakdown
-        extremas_vi = [(v, closes[i]) for i,v in enumerate(extremas)]
-        filtered = [(v,x) for (v,x) in extremas_vi if v!=0]
-        if(len(filtered)>0):
-            last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
-            if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
-                direction = -1
-            elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
-                direction = 1
+    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
+        direction = -1
+    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
+        direction = 1
+
+    # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
+    #     #reversal
+    #     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and (ltp_change_pc < 0)):
+    #         direction = -1
+    #     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and (ltp_change_pc > 0)):
+    #         direction = 1
+    #     #breakdown
+    #     extremas_vi = [(v, closes[i]) for i,v in enumerate(extremas)]
+    #     filtered = [(v,x) for (v,x) in extremas_vi if v!=0]
+    #     if(len(filtered)>0):
+    #         last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
+    #         if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
+    #             direction = -1
+    #         elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
+    #             direction = 1
 
     print('BANKNIFTY_DIRECTION', direction)
     ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas})
