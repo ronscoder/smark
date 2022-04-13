@@ -63,18 +63,20 @@ def action(channcel, data):
             if(direction == previous):
                 pass
             else:
+                print('Cancelling reverse directional order')
                 orderapi.cancel_open_buy_orders()
-    if(len(oorders) == 0):
-        #=> there is no open sell orders
-        print('There is no position.', 'Placing order...')
-        try:
-            insts = place_orders(direction)
-            print('exe_directional', insts)
-        except Exception as ex:
-            print('Error placing orders')
-            print(ex.__str__())
-    else:
-        pass
+        osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
+        if(len(osellorders) == 0):
+            #=> there is no open sell orders
+            print('There is no position.', 'Placing order...')
+            try:
+                insts = place_orders(direction)
+                print('exe_directional', insts)
+            except Exception as ex:
+                print('Error placing orders')
+                print(ex.__str__())
+        else:
+            pass
 
 if(__name__ == '__main__'):
     print('Directional place order started')
