@@ -53,9 +53,17 @@ def place_orders(direction):
 
 
 def action(channcel, data):
-    direction = data['direction']
+    direction = data['direction'] if 'direction' in data else None
+    previous = data['previous'] if 'previous' in data else None
     print('PLACE ORDERS checking...')
     oorders = orderapi.get_open_orders()
+    if(direction is not None):
+        obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
+        if(len(obuyorders)>0):
+            if(direction == previous):
+                pass
+            else:
+                orderapi.cancel_open_buy_orders()
     if(len(oorders) == 0):
         #=> there is no open sell orders
         print('There is no position.', 'Placing order...')

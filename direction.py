@@ -76,9 +76,9 @@ def calculate(channel, data):
     #             direction = -1
     #         elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
     #             direction = 1
-
     print('BANKNIFTY_DIRECTION', direction)
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas})
+    previous = ps1.get('BANKNIFTY_DIRECTION')
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous})
 
 
 if(__name__=='__main__'):
