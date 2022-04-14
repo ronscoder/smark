@@ -38,6 +38,7 @@ def getgraph(symbol):
         fig.add_shape(type='line', x0=0, x1=len(histohlcs), y0=last_price,
                       y1=last_price, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
         bankniftysignal = r.get('BANKNIFTY_DIRECTION')
+        print(bankniftysignal)
         if(not bankniftysignal is None):
             # extremas = get_extremas(closes, freqfact, order)
             extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None

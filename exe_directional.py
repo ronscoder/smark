@@ -64,6 +64,7 @@ def action(channcel, data):
                 pass
             else:
                 print('Cancelling reverse directional order')
+                orderapi.exit_all_positions()
                 orderapi.cancel_open_buy_orders()
         osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
         if(len(osellorders) == 0):
