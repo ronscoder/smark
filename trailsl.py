@@ -1,3 +1,4 @@
+from unittest import expectedFailure
 from libs.pubsub import get_ps_1
 from libs.configs import getConfig, getConfigs
 from libs.orderapi import Orderapi
@@ -66,7 +67,13 @@ def action(channel, data):
     else:
         
         pass
-
+def cb(channel, data):
+    try:
+        action(channel, data)
+    except Exception as ex:
+        print('Error')
+        print(ex.__str__())
+    
 if(__name__=='__main__'):
     print('running trail SL...')
-    p1.subscribe(['TICK_*'], cb=action)
+    p1.subscribe(['TICK_*'], cb=cb)
