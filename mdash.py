@@ -1,4 +1,4 @@
-from libs.configs import getConfigs
+# from libs.configs import getConfigs
 from plotly.subplots import make_subplots
 import dash
 from dash.dependencies import Input, Output, State
@@ -6,27 +6,41 @@ from dash import html
 from dash import dcc
 import plotly.graph_objects as go
 import plotly.express as px
-from libs.pubsub import get_ps_1
-from direction import get_extremas
+# from libs.pubsub import get_ps_1
+# from direction import get_extremas
+import pickle
+import os
+from direction import _calculate
 
-r = r3 = get_ps_1('mdash')
+# r = r3 = get_ps_1('mdash')
 app = dash.Dash(__name__, title='MDashAoVs')
 
 symbols = [['NIFTY BANK', 260105, '^NSEBANK', 'INDEX'],]
 instruments = [{'symbol': x[0], 'token': x[1], 'ysymbol': x[2], 'type': x[3]}
                    for x in symbols]
 
-configs = getConfigs()
-freqfact = configs['FREQ_CUTOFF_FACTOR']
-order = configs['EXTREMA_ORDER']
+# configs = getConfigs()
+# freqfact = configs['FREQ_CUTOFF_FACTOR']
+# order = configs['EXTREMA_ORDER']
 
 def getgraph(symbol):
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True)
-    histohlcs = r.get(f'HISTORY_260105')
+    histohlcs = None
+    fpath = 'sample/history'
+    if(os.path.exists(fpath)):
+        with open(fpath, 'rb') as f:
+            histohlcs = pickle.load(f)
+
+    fpathoffset = 'sample/history_offset'
+    histohlcs_offset=None
+    if(os.path.exists(fpathoffset)):
+        with open(fpathoffset, 'rb') as f:
+            histohlcs_offset = pickle.load(f)
     
     divs = []
-    if(not histohlcs is None):
-
+    if(not (None in (histohlcs, histohlcs_offset))):
+        direction, extremas = _calculate(histohlcs_offset)
+        print(direction, extremas)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
@@ -34,20 +48,22 @@ def getgraph(symbol):
         fig.add_trace(go.Candlestick(
             x=list(range(len(histohlcs))), open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
 
-        last_price = r.get(f'TICK_{260105}')
-        fig.add_shape(type='line', x0=0, x1=len(histohlcs), y0=last_price,
-                      y1=last_price, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
-        bankniftysignal = r.get('BANKNIFTY_DIRECTION')
-        print(bankniftysignal)
-        if(not bankniftysignal is None):
+        # last_price = r.get(f'TICK_{260105}')
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-1, x1=len(histohlcs_offset)-1, y0=min(lows) + (max(highs)-min(lows))/2,
+                      y1=min(lows), line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
+        # bankniftysignal = r.get('BANKNIFTY_DIRECTION')
+        # print(bankniftysignal)
+        # if(not bankniftysignal is None):
+        if(True):
             # extremas = get_extremas(closes, freqfact, order)
-            extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
-            direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
-            print(direction, extremas[:-5])
+            # extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
+            # direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
+            # print(direction, extremas[:-5])
             if(not direction is None):
-                l = len(extremas)
+                l = len(histohlcs_offset) - 1
                 fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
-                        y1=min(lows), line=dict(color='red' if direction==-1 else 'blue', width=2), row=1, col=1)
+                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='red' if direction==-1 else 'green', width=2, dash='solid'), row=1, col=1)
+                
             if(extremas is not None):
                 maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==-1]
                 minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==1]
@@ -84,17 +100,17 @@ app.layout = html.Div(children=[
 def getPropId(ctx):
     return ctx.triggered[0]['prop_id'].split('.')[0]
 
-@ app.callback(Output('btn_pause', 'children'), Input('btn_pause', 'n_clicks'))
-def pause(n_clicks):
-    paused = r.get('PAUSED')
-    print(paused, n_clicks)
-    if(paused is None):
-        paused = False
-    if(n_clicks is None):
-        pass
-    else:
-        r.set('PAUSED', not paused)
-    return 'paused' if paused else 'pause'
+# @ app.callback(Output('btn_pause', 'children'), Input('btn_pause', 'n_clicks'))
+# def pause(n_clicks):
+#     # paused = r.get('PAUSED')
+#     print(paused, n_clicks)
+#     if(paused is None):
+#         paused = False
+#     if(n_clicks is None):
+#         pass
+#     else:
+#         # r.set('PAUSED', not paused)
+#     return 'paused' if paused else 'pause'
 
 
 @ app.callback(Output('contentdyn', 'children'),

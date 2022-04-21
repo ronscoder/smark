@@ -1,1 +1,0 @@
-python3 direction.py & python3 test_history.py

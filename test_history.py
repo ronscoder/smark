@@ -1,29 +1,28 @@
-import time
 from libs.pubsub import get_ps_1
+
+
 import pickle
-import datetime
+
+file = f'sample/HISTORY_260105_{input("suffix: ")}'
+
 import os
 
-p1 = get_ps_1('test history')
-
-file = f'temp/HISTORY_260105_{datetime.datetime.now().month}{datetime.datetime.now().day}'
-datap = None
+history = None
 if(os.path.exists(file)):
-    if(input('Reuse data? ') == 'y'):
-        with open(file, 'rb') as f:
-            datap = pickle.load(f)
-if(datap == None):
-    datap = p1.get('HISTORY_260105')
+    with open(file, 'rb') as f:
+        history = pickle.load(f)
+else:
+    ps1 = get_ps_1('test_history')
+    history = ps1.get('HISTORY_260105')
     with open(file, 'wb') as f:
-        pickle.dump(datap, f)
+        pickle.dump(history, f)
 
-ohlcs = datap[:10]
-for ohlc in datap[11:]:
-    ohlcs.append(ohlc)
-    paused = p1.get('PAUSED')
-    while(paused):
-        time.sleep(5)
-        print('paused')
-        paused = p1.get('PAUSED')            
-    p1.publish(f'HISTORY_260105', ohlcs)
-    time.sleep(2)
+while(True):
+    if(not history is None):
+        print('length', len(history))
+        offset = int(input('upto: '))
+        data = history[:offset+1]
+        with open('sample/history', 'wb') as f:
+            pickle.dump(history, f)
+        with open('sample/history_offset', 'wb') as f:
+            pickle.dump(data, f)

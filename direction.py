@@ -1,6 +1,6 @@
 
 import enum
-from libs.pubsub import get_ps_1
+from libs.pubsub import PubSub, get_ps_1
 from libs.tools import mva
 from libs.configs import getConfigs
 import datetime
@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from scipy.signal import argrelextrema
 
-ps1 = get_ps_1('direction')
+
 
 def get_extremas(data, freqcutoff, order=12):
     freqfact = freqcutoff
@@ -33,7 +33,8 @@ def get_extremas(data, freqcutoff, order=12):
     return extremas
 
 #TODO check the condition for every tick, or check with the last candle
-def calculate(channel, data):
+
+def _calculate(data):
     # print('history', len(data))
     configs = getConfigs()
     ma_periods = configs['MA_PERIODS']
@@ -46,7 +47,6 @@ def calculate(channel, data):
     # malong = mva(max(ma_periods), closes)
     ltp = closes[-1]
     # ftp = opens[-1]
-    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
 
     direction = None
     ltp_change_pc = (ltp - opens[-extrema_window])/opens[-extrema_window]*100
@@ -55,33 +55,25 @@ def calculate(channel, data):
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas = get_extremas(closes, freqfact, order)
     print('Closes[-2]-[-1]', ltp_change_pc)
-
+    print('extrema_window', extrema_window)
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
+    return direction, extremas
 
-    # if(abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']):
-    #     #reversal
-    #     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and (ltp_change_pc < 0)):
-    #         direction = -1
-    #     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and (ltp_change_pc > 0)):
-    #         direction = 1
-    #     #breakdown
-    #     extremas_vi = [(v, closes[i]) for i,v in enumerate(extremas)]
-    #     filtered = [(v,x) for (v,x) in extremas_vi if v!=0]
-    #     if(len(filtered)>0):
-    #         last_extrema_vx = [(v,x) for (v,x) in extremas_vi if v!=0][-1]
-    #         if(last_extrema_vx[0] == -1 and ltp < last_extrema_vx[1]):
-    #             direction = -1
-    #         elif(last_extrema_vx[0] == 1 and ltp > last_extrema_vx[1]):
-    #             direction = 1
+def calculate(channel, data, ps1: PubSub):    
+    if(data is None):
+        return
+    direction, extremas = _calculate(data)
     print('BANKNIFTY_DIRECTION', direction)
     previous = ps1.get('BANKNIFTY_DIRECTION')
+    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous})
 
 
 if(__name__=='__main__'):
+    ps1 = get_ps_1('direction')
     print('Scanning direction from history')
     ps1.r.delete('BANKNIFTY_DIRECTION')
-    ps1.subscribe(['HISTORY_260105'], calculate)
+    ps1.subscribe(['HISTORY_260105'], lambda channel, data: calculate(channel, data, ps1))
