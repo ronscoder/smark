@@ -36,9 +36,10 @@ class Orderapi:
         orders = self.kite.orders()
         return [x for x in orders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']
 
-    def cancel_open_buy_orders(self):
+    def cancel_open_buy_orders(self, open_orders):
         print('cancel open buy orders')
-        open_orders = self.get_open_buy_orders()
+        if(open_orders is None):
+            open_orders = self.get_open_buy_orders()
         for order in open_orders:
             print('cancelling open order', order['tradingsymbol'])
             if(self.kite is None):
@@ -110,8 +111,9 @@ class Orderapi:
             return
         order_id = self.kite.place_order(**params)
     
-    def exit_all_positions(self):
-        sell_orders = self.get_open_sell_orders()
+    def exit_all_positions(self, sell_orders):
+        if(sell_orders is None):
+            sell_orders = self.get_open_sell_orders()
         for order in sell_orders:
             params = dict(variety=KC.VARIETY_REGULAR, order_id=order['order_id'],
                         order_type=KC.ORDER_TYPE_MARKET)

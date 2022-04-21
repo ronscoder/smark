@@ -9,42 +9,29 @@ p1 = get_ps_1('trailsl')
 orderapi = Orderapi()
 nifty_token = 260105
 
-def action(channel, data):
-    instrument_token = data['instrument_token']
-    if(instrument_token == nifty_token):
-        return
-    print('checking tick for new TRAIL')
-    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    if(timestamp.time() > datetime.time(hour=15, minute=15)):
-        orderapi.exit_all_positions()
-        return    
-    position = p1.get('CURRENT_BUY_ORDER')
-    if(position == None):
-        return
+def action(channel, data, position):
+    # instrument_token = data['instrument_token']
+    # if(instrument_token == nifty_token):
+    #     return
+    # print('checking tick for new TRAIL')
+    # timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+    # if(timestamp.time() > datetime.time(hour=15, minute=15)):
+    #     orderapi.exit_all_positions()
+    #     return    
+    # position = p1.get('CURRENT_BUY_ORDER')
+    # if(position == None):
+    #     return
     tradingsymbol = position['tradingsymbol']
-    instrument_token = position['instrument_token']
-    if(not channel == f'TICK_{instrument_token}'):
-        return
+    # instrument_token = position['instrument_token']
+    # if(not channel == f'TICK_{instrument_token}'):
+    #     return
     # print('trail SL check. position', tradingsymbol)
     price_bought = position['price']
     if(not 'COUNTER_SL_ORDER' in position):
         print('ERROR', 'NO SL SELL ORDER!')
         return
     slorder = position['COUNTER_SL_ORDER']
-    # base_price = price_bought if price_bought > stoploss else stoploss
-    # increment = math.floor(base_price * getConfig('TRAIL_PC'))
-    # if time of hold is greater than certain duration, and exit.
-    # order_time = datetime.datetime.fromisoformat(position['order_timestamp'])
-    # now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    # timepast = now.replace(tzinfo=None) - order_time
-    # exit_time = datetime.timedelta(minutes=configs['OPEN_ORDER_EXPIRY_MIN']*2)
-    # if(timepast >= exit_time):
-        # if(stoploss < price_bought):
-            # pass
-            # orderapi.modify_sl_order(order_id=position['COUNTER_SL_ORDER']['order_id'], price=round(ltp,1)-1, trigger=round(ltp,1)-1)
-        # else:
-            # orderapi.exit_position_market(order_id=position['COUNTER_SL_ORDER']['order_id'])
-        # return
+
     configs = getConfigs()   
     stoploss = slorder['price']
     # base_price = stoploss  
@@ -67,13 +54,34 @@ def action(channel, data):
     else:
         
         pass
-def cb(channel, data):
-    try:
-        action(channel, data)
-    except Exception as ex:
-        print('Error')
-        print(ex.__str__())
+def cb(channel, data, container = {}):
+    instrument_token = data['instrument_token']
+    if(instrument_token == nifty_token):
+        return
+    position = p1.get('CURRENT_BUY_ORDER')
+    if(position == None):
+        return
+    instrument_token = position['instrument_token']
+    if(not channel == f'TICK_{instrument_token}'):
+        return    
+    last_timestamp = container.get('last_timestamp', None)
+    timestamp = datetime.datetime.now()
+    if(last_timestamp is not None):
+        tdelta = timestamp - last_timestamp
+        if(tdelta > datetime.timedelta(minutes = getConfig('OHLC_MIN'))):
+            container = {}
+            try:
+                action(channel, data, position)
+            except Exception as ex:
+                print('Error')
+                print(ex.__str__())
+        else:
+            container['last_timestamp'] = timestamp
+    else:
+        container['last_timestamp'] = timestamp
+    
     
 if(__name__=='__main__'):
     print('running trail SL...')
-    p1.subscribe(['TICK_*'], cb=cb)
+    container = {}
+    p1.subscribe(['TICK_*'], cb=lambda channel, data: cb(channel, data, container))

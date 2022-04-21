@@ -1,3 +1,5 @@
+from msilib.schema import Directory
+from turtle import position
 from libs.pubsub import get_ps_1
 from libs.configs import getConfig
 import logging
@@ -54,29 +56,63 @@ def place_orders(direction):
 def action(channcel, data):
     direction = data['direction'] if 'direction' in data else None
     previous = data['previous'] if 'previous' in data else None
+    if(direction is None):
+        return
     print('PLACE ORDERS checking...')
     oorders = orderapi.get_open_orders()
-    if(direction is not None):
-        obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
-        if(len(obuyorders)>0):
-            if(direction == previous):
-                pass
+    osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']    
+    obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
+    # if open sell order and direction doesnot match, exist
+    if(len(osellorders)>0):
+        for order in osellorders:
+            position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
+            if(position_direction != direction):
+                #exit reversal
+                orderapi.exit_all_positions(osellorders)
             else:
-                print('Cancelling reverse directional order')
-                orderapi.exit_all_positions()
-                orderapi.cancel_open_buy_orders()
-        osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
-        if(len(osellorders) == 0):
-            #=> there is no open sell orders
-            print('There is no position.', 'Placing order...')
+                pass
+    else:
+        # no position
+        if(len(obuyorders)>0):
+            for order in obuyorders:
+                position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
+                if(position_direction != direction):
+                #exit reversal
+                    orderapi.cancel_open_buy_orders(obuyorders)
+                else:
+                    pass
+        else:
+            # place new order
+            print('There is no position.', 'Placing new order...')
             try:
                 insts = place_orders(direction)
-                print('exe_directional', insts)
+                print('try exe_directional', insts)
             except Exception as ex:
                 print('Error placing orders')
                 print(ex.__str__())
-        else:
-            pass
+
+    # if(direction is not None):
+        
+    #     obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
+    #     if(len(obuyorders)>0):
+    #         if(direction == previous):
+    #             pass
+    #         else:
+    #             print('Cancelling reverse directional order')
+    #             orderapi.exit_all_positions()
+    #             orderapi.cancel_open_buy_orders()
+    #     osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
+    #     if(len(osellorders) == 0):
+    #         #=> there is no open sell orders
+    #         print('There is no position.', 'Placing order...')
+    #         try:
+    #             insts = place_orders(direction)
+    #             print('exe_directional', insts)
+    #         except Exception as ex:
+    #             print('Error placing orders')
+    #             print(ex.__str__())
+    #     else:
+    #         pass
 
 if(__name__ == '__main__'):
     print('Directional place order started')
