@@ -73,7 +73,7 @@ def cb(channel, data, container = {}):
             try:
                 action(channel, data, position)
             except Exception as ex:
-                print('Error')
+                print('Error in trail sl')
                 print(ex.__str__())
         else:
             container['last_timestamp'] = timestamp
