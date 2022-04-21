@@ -1,7 +1,1 @@
-Add remote config command executor
-
-1. Cancel all open orders
-2. Exit all positions
-
-
-Separate workflow for Broadcast
+Replace redis with firestore

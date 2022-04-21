@@ -4,7 +4,7 @@ import pickle
 import datetime
 import os
 
-p1 = get_ps_1()
+p1 = get_ps_1('save')
 
 file = f'temp/HISTORY_260105_{input("suffix: ")}'
 datap = p1.get('HISTORY_260105')

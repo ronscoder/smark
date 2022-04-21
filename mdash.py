@@ -9,7 +9,7 @@ import plotly.express as px
 from libs.pubsub import get_ps_1
 from direction import get_extremas
 
-r = r3 = get_ps_1()
+r = r3 = get_ps_1('mdash')
 app = dash.Dash(__name__, title='MDashAoVs')
 
 symbols = [['NIFTY BANK', 260105, '^NSEBANK', 'INDEX'],]

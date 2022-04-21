@@ -51,7 +51,7 @@ def set_options(if_ce=True, if_pe=True):
     kite, kw = getKite()
     niftybank_token = 260105
     IN_CHANNEL = f'TICK_{niftybank_token}'
-    tick = get_ps_1().get(IN_CHANNEL)
+    tick = get_ps_1('setoptions').get(IN_CHANNEL)
     if(tick is None):
         print('tick is None')
         return

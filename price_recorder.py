@@ -3,7 +3,7 @@ from libs.pubsub import get_ps_1
 import datetime
 from libs.utilities import ydownload
 
-p1 = get_ps_1()
+p1 = get_ps_1('price recorder')
 
 
 class OHLC:

@@ -4,13 +4,12 @@ import logging
 import datetime
 from libs.orderapi import Orderapi
 from setoptions import set_options
-from truths import getTruthsOf
 import time
 from zoneinfo import ZoneInfo
 
 
 logging.basicConfig(filename="logs/place_orders.log", level=logging.DEBUG)
-ps1 = get_ps_1()
+ps1 = get_ps_1('exe boundary')
 orderapi = Orderapi()
 
 
@@ -24,10 +23,10 @@ def place_orders():
         print('Outside market time window')
         logging.info('Outside market time window')
         return
-    if(not getTruthsOf('BANKNIFTY')):
-        return
-    if(not getTruthsOf('GENERAL')):
-        return
+    # if(not getTruthsOf('BANKNIFTY')):
+    #     return
+    # if(not getTruthsOf('GENERAL')):
+    #     return
     # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
     if(not getConfig('BOUNDARY_EXE')):
         print('Boundary trade not activated')

@@ -14,7 +14,7 @@ def get_new_token(request_token=None):
         print("Open")
         # print(kite.login_url())
         webbrowser.open(kite.login_url(), new=0, autoraise=True)
-        request_token = input('Enter request token: ')
+        request_token = input('Ennter request token: ')
         if (request_token == ''):
             exit()
     try:
@@ -41,7 +41,10 @@ def get_access_token():
     # access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
     if(access_token is None):
-        print('No access token')
+        print('No access token. Getting new')
+        access_token = get_new_token(getConfig('request_token'))
+    if(access_token is None):
+        print('Error getting access token')
         return
     tokendatestr, token = access_token.split(":")
     tokendate = datetime.date(int(tokendatestr[:4]), int(

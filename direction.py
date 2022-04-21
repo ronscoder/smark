@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 from scipy.signal import argrelextrema
 
-ps1 = get_ps_1()
+ps1 = get_ps_1('direction')
 
 def get_extremas(data, freqcutoff, order=12):
     freqfact = freqcutoff

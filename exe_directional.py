@@ -4,13 +4,12 @@ import logging
 import datetime
 from libs.orderapi import Orderapi
 from setoptions import set_options
-from truths import getTruthsOf
 import time
 from zoneinfo import ZoneInfo
 
 
 logging.basicConfig(filename="logs/place_orders.log", level=logging.DEBUG)
-ps1 = get_ps_1()
+ps1 = get_ps_1('exe directional')
 orderapi = Orderapi()
 
 
@@ -29,10 +28,10 @@ def place_orders(direction):
         print('Directional trade not activated')
         return
 
-    if(not getTruthsOf('BANKNIFTY')):
-        return
-    if(not getTruthsOf('GENERAL')):
-        return
+    # if(not getTruthsOf('BANKNIFTY')):
+    #     return
+    # if(not getTruthsOf('GENERAL')):
+    #     return
     # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
     option = None
     inst = None

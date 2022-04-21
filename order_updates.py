@@ -7,7 +7,7 @@ import time
 
 logging.basicConfig(filename="logs/order_updates.log", level=logging.DEBUG)
 
-ps1 = get_ps_1()
+ps1 = get_ps_1('order_updates')
 channels = ['ORDER_UPDATE']
 
 kite, kw = getKite()

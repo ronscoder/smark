@@ -5,7 +5,7 @@ from libs.orderapi import Orderapi
 import datetime
 from zoneinfo import ZoneInfo
 
-p1 = get_ps_1()
+p1 = get_ps_1('trailsl')
 orderapi = Orderapi()
 nifty_token = 260105
 

@@ -13,7 +13,7 @@ import time
 class Orderapi:
     def __init__(self) -> None:
         self.kite, _ = getKite()
-        self.r1 = get_ps_1()
+        self.r1 = get_ps_1('order api')
 
     def get_open_orders(self):
         if(self.kite is None):

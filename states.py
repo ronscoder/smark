@@ -1,7 +1,7 @@
 from libs.configs import getConfigs, setConfigs
 from libs.pubsub import get_ps_1
 
-p1 = get_ps_1()
+p1 = get_ps_1('states')
 
 while True:
     print()

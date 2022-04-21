@@ -2,7 +2,7 @@ import telegram_send
 from libs.pubsub import get_ps_1
 
 
-ps1 = get_ps_1()
+ps1 = get_ps_1('broadcast')
 
 symbol = 'NIFTY BANK'
 channels = ['SIGNAL_DIRECTION_NIFTY BANK', 'TELEREPORTING', 'SMARKMSG']

@@ -11,7 +11,7 @@ import pickle
 import datetime
 import os
 
-p1 = get_ps_1()
+p1 = get_ps_1('test')
 
 file = f'temp/HISTORY_260105_{datetime.datetime.now().month}{datetime.datetime.now().day}'
 datap = None

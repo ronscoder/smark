@@ -25,7 +25,7 @@ class PubSub:
         else:
             self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-34-202-133-28.compute-1.amazonaws.com:15709', db=db)
         self.ps = self.r.pubsub()
-        print('redis client', pname)
+        print(pname)
         print('redis client count', len(self.r.client_list()))
 
     def set(self, key, data):

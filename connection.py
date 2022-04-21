@@ -5,7 +5,7 @@ import threading
 from order_updates import handle_order_update
 # from multiprocessing import process
 'This is connection point to main server. and meant to run without interruptions and any complex calculations'
-r = get_ps_1()
+r = get_ps_1('connection')
 
 def connect():
     'This module is intended to run continuously. '
