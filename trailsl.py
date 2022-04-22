@@ -68,6 +68,7 @@ def cb(channel, data, container = {}):
     timestamp = datetime.datetime.now()
     if(last_timestamp is not None):
         tdelta = timestamp - last_timestamp
+        print('Trailing SL, time delta', tdelta)
         if(tdelta > datetime.timedelta(minutes = getConfig('OHLC_MIN'))):
             container = {}
             try:
