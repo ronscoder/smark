@@ -40,9 +40,10 @@ def get_access_token():
     access_token = getConfig('ACCESS_TOKEN')
     # access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
+    request_token = getConfig('request_token')
     if(access_token is None):
         print('No access token. Getting new')
-        access_token = get_new_token(getConfig('request_token'))
+        access_token = get_new_token(request_token)
     if(access_token is None):
         print('Error getting access token')
         return
@@ -52,7 +53,7 @@ def get_access_token():
     today = datetime.date.today()
     if(today != tokendate):
         print('Access token expired.')
-        access_token = get_new_token(getConfig('request_token'))
+        access_token = get_new_token(request_token)
     return token
 
 
