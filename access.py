@@ -52,7 +52,7 @@ def get_access_token():
     today = datetime.date.today()
     if(today != tokendate):
         print('Access token expired.')
-        return
+        access_token = get_new_token(getConfig('request_token'))
     return token
 
 
