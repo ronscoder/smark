@@ -21,7 +21,7 @@ def action(data):
             timepast = now.replace(tzinfo=None) - order_time
             if(timepast > datetime.timedelta(minutes=expiry_min)):
                 print('Canceling expired open buy orders', expiry_min)
-                orderapi.cancel_open_buy_orders()
+                orderapi.cancel_open_buy_orders([order])
             # elif(timepast > datetime.timedelta(minutes=round(expiry_min/2-1))):
             elif(timepast > datetime.timedelta(minutes=candle_min)):
                 print('Changing open buy order triggers')
