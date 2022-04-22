@@ -7,7 +7,11 @@ import subprocess
 import os
 
 def get_new_token(request_token=None):
-    kite = KiteConnect(api_key=getConfig('api_key'))
+    # api_key = getConfig('api_key')
+    api_key = '7zx0e8g535qgefu6'
+    # api_secret = getConfig('api_secret')
+    api_secret = 'utwyn9ugmbxfcx6wurcd869mtvn2ck30'
+    kite = KiteConnect(api_key=api_key)
     now = datetime.datetime.now()
     print(kite.login_url())
     if(request_token is None):
@@ -18,7 +22,9 @@ def get_new_token(request_token=None):
         if (request_token == ''):
             exit()
     try:
-        data = kite.generate_session(request_token, api_secret=getConfig('api_secret'))
+        # import pdb
+        # pdb.set_trace()
+        data = kite.generate_session(request_token, api_secret=api_secret)
         # print(data)
         access_token = data['access_token']
         val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
@@ -41,6 +47,7 @@ def get_access_token():
     # access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
     request_token = getConfig('request_token')
+    print('request_token', request_token)
     if(access_token is None):
         print('No access token. Getting new')
         access_token = get_new_token(request_token)
@@ -67,4 +74,5 @@ def get_access_token():
 #     print()
 
 if __name__ == "__main__":
-    print(get_new_token())
+    # print(get_new_token())
+    get_access_token()
