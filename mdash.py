@@ -39,8 +39,8 @@ def getgraph(symbol):
     
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
-        direction, extremas = _calculate(histohlcs_offset)
-        print(direction, extremas)
+        direction, extremas, ys = _calculate(histohlcs_offset)
+        print(direction, extremas, ys)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
@@ -69,10 +69,12 @@ def getgraph(symbol):
                 minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==1]
                 for i,v in maximas:
                     fig.add_shape(type='line', x0=i-2, x1=i+2, y0=v,
-                        y1=v, line=dict(color='red', width=2), row=1, col=1)
+                        y1=v, line=dict(color='red', width=3), row=1, col=1)
                 for i,v in minimas:
                     fig.add_shape(type='line', x0=i-2, x1=i+2, y0=v,
-                        y1=v, line=dict(color='green', width=2), row=1, col=1)
+                        y1=v, line=dict(color='green', width=3), row=1, col=1)
+            if(ys is not None):
+                fig.add_trace(go.Scatter(y=ys))
         # fig.add_trace(go.Scatter(x=[i for i,x in extremasv], y=[x for i,x in extremasv], mode="markers"))
         # for i, extrema in enumerate(extremas):
         #     if(extrema == 1):

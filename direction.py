@@ -30,7 +30,7 @@ def get_extremas(data, freqcutoff, order=12):
     for minid in minids:
         extremas[minid] = 1
     print('extremas', extremas)
-    return extremas
+    return extremas, ys
 
 #TODO check the condition for every tick, or check with the last candle
 
@@ -53,19 +53,19 @@ def _calculate(data):
 
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
-    extremas = get_extremas(closes, freqfact, order)
+    extremas, ys = get_extremas(closes, freqfact, order)
     print('Closes[-2]-[-1]', ltp_change_pc)
     print('extrema_window', extrema_window)
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
-    return direction, extremas
+    return direction, extremas, ys
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
         return
-    direction, extremas = _calculate(data)
+    direction, extremas, ys = _calculate(data)
     print('BANKNIFTY_DIRECTION', direction)
     previous = ps1.get('BANKNIFTY_DIRECTION')
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
