@@ -77,7 +77,8 @@ def cb(channel, data, container = {}):
                 print('Error in trail sl')
                 print(ex.__str__())
         else:
-            container['last_timestamp'] = timestamp
+            pass
+            #container['last_timestamp'] = timestamp
     else:
         container['last_timestamp'] = timestamp
     
