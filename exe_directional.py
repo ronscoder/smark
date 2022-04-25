@@ -91,7 +91,9 @@ class Action:
                 try:
                     if(self.last_exit == 0):
                         insts = self.place_orders(direction)
-                    print('try exe_directional', insts)
+                        print('try exe_directional', insts)
+                    else:
+                        print('Place order aborted due to recent directional exit')
                 except Exception as ex:
                     print('Error placing orders')
                     print(ex.__str__())
