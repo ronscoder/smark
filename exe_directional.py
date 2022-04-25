@@ -1,5 +1,5 @@
 from libs.pubsub import get_ps_1
-from libs.configs import getConfig
+from libs.configs import getConfig, getConfigs
 import logging
 import datetime
 from libs.orderapi import Orderapi
@@ -49,69 +49,78 @@ def place_orders(direction):
         return option
     
 
-
-def action(channcel, data):
-    direction = data['direction'] if 'direction' in data else None
-    previous = data['previous'] if 'previous' in data else None
-    if(direction is None):
-        return
-    print('PLACE ORDERS checking...')
-    oorders = orderapi.get_open_orders()
-    osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']    
-    obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
-    # if open sell order and direction doesnot match, exist
-    if(len(osellorders)>0):
-        for order in osellorders:
-            position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
-            if(position_direction != direction):
-                #exit reversal
-                orderapi.exit_all_positions([order])
-            else:
-                pass
-    else:
-        # no position
-        if(len(obuyorders)>0):
-            for order in obuyorders:
+class Action:
+    def __init__(self) -> None:
+        self.configs = getConfigs()
+        self.last_exit = 0
+    def action(self, channcel, data):
+        direction = data['direction'] if 'direction' in data else None
+        previous = data['previous'] if 'previous' in data else None
+        if(self.last_exit > 0):
+            self.last_exit -= 1
+        if(direction is None):
+            return
+        print('PLACE ORDERS checking...')
+        oorders = orderapi.get_open_orders()
+        osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']    
+        obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
+        # if open sell order and direction doesnot match, exist
+        if(len(osellorders)>0):
+            for order in osellorders:
                 position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
                 if(position_direction != direction):
-                #exit reversal
-                    orderapi.cancel_open_buy_orders([order])
+                    #exit reversal
+                    orderapi.exit_all_positions([order])
+                    #TODO exclude taking new position for this direction for extrema_window = configs['EXTREMA_WINDOW']
+                    self.last_exit = self.configs['EXTREMA_WINDOW']
                 else:
                     pass
         else:
-            # place new order
-            print('There is no position.', 'Placing new order...')
-            try:
-                insts = place_orders(direction)
-                print('try exe_directional', insts)
-            except Exception as ex:
-                print('Error placing orders')
-                print(ex.__str__())
+            # no position
+            if(len(obuyorders)>0):
+                for order in obuyorders:
+                    position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
+                    if(position_direction != direction):
+                    #exit reversal
+                        orderapi.cancel_open_buy_orders([order])
+                    else:
+                        pass
+            else:
+                # place new order
+                print('There is no position.', 'Placing new order...')
+                try:
+                    if(self.last_exit == 0):
+                        insts = place_orders(direction)
+                    print('try exe_directional', insts)
+                except Exception as ex:
+                    print('Error placing orders')
+                    print(ex.__str__())
 
-    # if(direction is not None):
-        
-    #     obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
-    #     if(len(obuyorders)>0):
-    #         if(direction == previous):
-    #             pass
-    #         else:
-    #             print('Cancelling reverse directional order')
-    #             orderapi.exit_all_positions()
-    #             orderapi.cancel_open_buy_orders()
-    #     osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
-    #     if(len(osellorders) == 0):
-    #         #=> there is no open sell orders
-    #         print('There is no position.', 'Placing order...')
-    #         try:
-    #             insts = place_orders(direction)
-    #             print('exe_directional', insts)
-    #         except Exception as ex:
-    #             print('Error placing orders')
-    #             print(ex.__str__())
-    #     else:
-    #         pass
+        # if(direction is not None):
+            
+        #     obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
+        #     if(len(obuyorders)>0):
+        #         if(direction == previous):
+        #             pass
+        #         else:
+        #             print('Cancelling reverse directional order')
+        #             orderapi.exit_all_positions()
+        #             orderapi.cancel_open_buy_orders()
+        #     osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
+        #     if(len(osellorders) == 0):
+        #         #=> there is no open sell orders
+        #         print('There is no position.', 'Placing order...')
+        #         try:
+        #             insts = place_orders(direction)
+        #             print('exe_directional', insts)
+        #         except Exception as ex:
+        #             print('Error placing orders')
+        #             print(ex.__str__())
+        #     else:
+        #         pass
 
 if(__name__ == '__main__'):
     print('Directional place order started')
-    ps1.subscribe(['BANKNIFTY_DIRECTION'], action)
+    action = Action()
+    ps1.subscribe(['BANKNIFTY_DIRECTION'], action.action)
 

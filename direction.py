@@ -55,7 +55,7 @@ def _calculate(data):
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas, ys = get_extremas(closes, freqfact, order)
     print('Closes[-2]-[-1]', ltp_change_pc)
-    print('extrema_window', extrema_window)
+    # print('extrema_window', extrema_window)
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
