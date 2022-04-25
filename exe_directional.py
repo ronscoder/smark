@@ -65,7 +65,7 @@ def action(channcel, data):
             position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
             if(position_direction != direction):
                 #exit reversal
-                orderapi.exit_all_positions(osellorders)
+                orderapi.exit_all_positions([order])
             else:
                 pass
     else:
