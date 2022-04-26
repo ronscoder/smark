@@ -59,6 +59,7 @@ class Action:
         if_good_gap = data['if_good_gap'] if 'if_good_gap' in data else None
         if(self.last_exit > 0):
             self.last_exit -= 1
+        print('last exit CD', self.last_exit)
         if(direction is None):
             return
         print('PLACE ORDERS checking...')
