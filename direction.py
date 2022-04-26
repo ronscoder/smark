@@ -12,14 +12,14 @@ from scipy.signal import argrelextrema
 
 def get_extremas(data, freqcutoff, order=12):
     freqfact = freqcutoff
-    closes = data
-    if(freqfact == 0.0):
-        ys = np.array(closes)
-    else:
-        Yw = np.fft.rfft(closes)
-        print('number of frequencies', len(Yw))
-        Yw[round(len(Yw)/freqfact):] = 0
-        ys = np.fft.irfft(Yw, len(closes))
+    ys = np.array(data)
+    # if(freqfact == 0.0):
+    #     ys = np.array(closes)
+    # else:
+    #     Yw = np.fft.rfft(closes)
+    #     print('number of frequencies', len(Yw))
+    #     Yw[round(len(Yw)/freqfact):] = 0
+    #     ys = np.fft.irfft(Yw, len(closes))
     maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
     minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
     # maxs = [(x, data[x]) for x in maxids]
@@ -47,11 +47,11 @@ def _calculate(data):
     conditions = {}
     # mashort = mva(min(ma_periods), closes)
     # malong = mva(max(ma_periods), closes)
-    ltp = closes[-1]
+    # ltp = closes[-1]
     # ftp = opens[-1]
 
     direction = None
-    ltp_change_pc = (ltp - opens[-1])/opens[-1]*100
+    ltp_change_pc = (closes[-1] - opens[-1])/opens[-1]*100
     print('ltp_change_pc', ltp_change_pc)
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
@@ -71,16 +71,38 @@ def _calculate(data):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
-    return direction, extremas, ys, if_good_extrema_gap, abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
+    
+    # if price breaks all resistance
+    if_resistance_broken = False
+    raovs = [x for d, x in extremas_values if d==-1][-2:]
+    print('raovs', raovs, 'closes[-1]', closes[-1])
+    if(any([closes[-1] > r for r in raovs])):
+        if_resistance_broken = True
+        # print('closes', [close for close in closes[-extrema_window-1:-1]])
+        if(not all([close > aov for close in closes[-extrema_window:-1] for aov in raovs])):
+            direction = 1
+        print('if_resistance_broken', if_resistance_broken)
+
+    # if price breaks all supports
+    if_support_broken = False
+    saovs = [x for d, x in extremas_values if d==1][-2:]
+    print('saovs', saovs)
+    if(any([closes[-1] < r for r in saovs])):
+        if_support_broken = True
+        if(not all([close > aov for close in closes[-extrema_window:-1] for aov in saovs])):
+            direction = -1
+        print('if_support_broken', if_support_broken)
+
+    return direction, extremas, ys, if_good_extrema_gap, abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC'], if_resistance_broken, if_support_broken
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
         return
-    direction, extremas, ys, if_good_gap, if_good_momentum = _calculate(data)
+    direction, extremas, ys, if_good_gap, if_good_momentum, if_resistance_broken, if_support_broken = _calculate(data)
     print('BANKNIFTY_DIRECTION', direction, 'if_good_gap', if_good_gap)
     previous = ps1.get('BANKNIFTY_DIRECTION')
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'if_good_momentum': if_good_momentum})
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'if_good_momentum': if_good_momentum, 'if_resistance_broken':if_resistance_broken, 'if_support_broken':if_support_broken})
 
 
 if(__name__=='__main__'):

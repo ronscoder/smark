@@ -58,6 +58,9 @@ class Action:
         previous = data['previous'] if 'previous' in data else None
         if_good_gap = data['if_good_gap'] if 'if_good_gap' in data else None
         if_good_momentum = data['if_good_momentum'] if 'if_good_momentum' in data else None
+        if_resistance_broken = data['if_resistance_broken'] if 'if_resistance_broken' in data else None
+        if_support_broken = data['if_support_broken'] if 'if_support_broken' in data else None
+
         if(self.last_exit > 0):
             self.last_exit -= 1
         print('last exit CD', self.last_exit)
@@ -93,7 +96,8 @@ class Action:
                 print('There is no position.', 'Placing new order...')
                 try:
                     if(self.last_exit == 0):
-                        if(if_good_gap and if_good_momentum):
+                        # if(if_good_momentum and (if_good_gap or if_resistance_broken or if_support_broken)):
+                        if((not if_support_broken and (if_good_momentum and (if_good_gap or if_resistance_broken))) or (not if_resistance_broken and (if_good_momentum and (if_good_gap or if_support_broken)))):
                             insts = self.place_orders(direction)
                             print('try exe_directional', insts)
                         else:

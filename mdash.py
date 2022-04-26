@@ -39,7 +39,7 @@ def getgraph(symbol):
     
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
-        direction, extremas, ys, if_good_gap, if_good_momentum = _calculate(histohlcs_offset)
+        direction, extremas, ys, if_good_gap, if_good_momentum, if_resistance_broken, if_support_broken = _calculate(histohlcs_offset)
         print(direction, extremas, if_good_gap, if_good_momentum)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
@@ -59,22 +59,27 @@ def getgraph(symbol):
             # extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
             # direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
             # print(direction, extremas[:-5])
-            if(not direction is None and if_good_gap and if_good_momentum):
+            if(direction ==1 and not if_support_broken and (if_good_momentum and (if_good_gap or if_resistance_broken))):
                 l = len(histohlcs_offset) - 1
                 fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
-                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='red' if direction==-1 else 'green', width=2, dash='solid'), row=1, col=1)
+                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='green', width=2, dash='solid'), row=1, col=1)
+            
+            if(direction ==-1 and not if_resistance_broken and (if_good_momentum and (if_good_gap or if_support_broken))):
+                l = len(histohlcs_offset) - 1
+                fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
+                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
                 
             if(extremas is not None):
                 maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==-1]
                 minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==1]
                 for i,v in maximas:
-                    fig.add_shape(type='line', x0=i-2, x1=i+2, y0=v,
-                        y1=v, line=dict(color='red', width=3), row=1, col=1)
+                    fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
+                        y1=v+50, line=dict(color='purple', width=10), row=1, col=1)
                 for i,v in minimas:
-                    fig.add_shape(type='line', x0=i-2, x1=i+2, y0=v,
-                        y1=v, line=dict(color='green', width=3), row=1, col=1)
-            if(ys is not None):
-                fig.add_trace(go.Scatter(y=ys))
+                    fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
+                        y1=v-50, line=dict(color='blue', width=10), row=1, col=1)
+            # if(ys is not None):
+            #     fig.add_trace(go.Scatter(y=ys))
         # fig.add_trace(go.Scatter(x=[i for i,x in extremasv], y=[x for i,x in extremasv], mode="markers"))
         # for i, extrema in enumerate(extremas):
         #     if(extrema == 1):
