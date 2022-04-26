@@ -80,7 +80,7 @@ def calculate(channel, data, ps1: PubSub):
     print('BANKNIFTY_DIRECTION', direction, 'if_good_gap', if_good_gap)
     previous = ps1.get('BANKNIFTY_DIRECTION')
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'ltp_change_pc': if_good_momentum})
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'if_good_momentum': if_good_momentum})
 
 
 if(__name__=='__main__'):
