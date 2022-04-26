@@ -91,9 +91,10 @@ class Action:
                 # place new order
                 print('There is no position.', 'Placing new order...')
                 try:
-                    if(self.last_exit == 0 and if_good_gap):
-                        insts = self.place_orders(direction)
-                        print('try exe_directional', insts)
+                    if(self.last_exit == 0):
+                        if(if_good_gap):
+                            insts = self.place_orders(direction)
+                            print('try exe_directional', insts)
                     else:
                         print('Place order aborted due to recent directional exit')
                 except Exception as ex:
