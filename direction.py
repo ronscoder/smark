@@ -60,20 +60,20 @@ def _calculate(data):
     diffextremas = 0
     if(len(extremas_values[-2:])>1):
         diffextremas = abs(extremas_values[-1] - extremas_values[-2])
-    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and diffextremas > configs['EXTREMA_GAP']):
+    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
-    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and diffextremas > configs['EXTREMA_GAP']):
+    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
-    return direction, extremas, ys
+    return direction, extremas, ys, diffextremas > configs['EXTREMA_GAP']
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
         return
-    direction, extremas, ys = _calculate(data)
+    direction, extremas, ys, if_good_gap = _calculate(data)
     print('BANKNIFTY_DIRECTION', direction)
     previous = ps1.get('BANKNIFTY_DIRECTION')
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous})
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap})
 
 
 if(__name__=='__main__'):

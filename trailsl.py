@@ -39,9 +39,9 @@ def action(channel, data, position):
     trigger = round(base_price + base_price * configs['TRAIL_BUFFER_PC'],1)
     ltp = data['last_price']
     # newstoploss = math.floor(base_price * (1+getConfig('TRAIL_PC')))
-    print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',trigger, 'ltp', ltp)
+    newstoploss = round(base_price + (trigger - base_price)*configs['TRAIL_RATIO'],1)
+    print('trail SL', tradingsymbol, 'base price', base_price, 'stoploss',stoploss, 'new trigger',f'{newstoploss}/{trigger}', 'ltp', ltp)
     if(ltp > trigger):
-        newstoploss = round(base_price + (trigger - base_price)*configs['TRAIL_RATIO'],1)
         # unit_pl = ltp - base_price
         # factor = unit_pl//increment
         # newstoploss = base_price + increment * factor

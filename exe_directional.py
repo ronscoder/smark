@@ -56,6 +56,7 @@ class Action:
     def action(self, channcel, data):
         direction = data['direction'] if 'direction' in data else None
         previous = data['previous'] if 'previous' in data else None
+        if_good_gap = data['if_good_gap'] if 'if_good_gap' in data else None
         if(self.last_exit > 0):
             self.last_exit -= 1
         if(direction is None):
@@ -89,7 +90,7 @@ class Action:
                 # place new order
                 print('There is no position.', 'Placing new order...')
                 try:
-                    if(self.last_exit == 0):
+                    if(self.last_exit == 0 and if_good_gap):
                         insts = self.place_orders(direction)
                         print('try exe_directional', insts)
                     else:
