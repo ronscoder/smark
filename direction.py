@@ -54,11 +54,15 @@ def _calculate(data):
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas, ys = get_extremas(closes, freqfact, order)
+    extremas_values = [ys[i] for i in range(extremas) if extremas[i]!=0]
     print('Closes[-2]-[-1]', ltp_change_pc)
     # print('extrema_window', extrema_window)
-    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
+    diffextremas = 0
+    if(len(extremas_values[-2:])>1):
+        diffextremas = abs(extremas_values[-1] - extremas_values[-2])
+    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:]) and diffextremas > configs['EXTREMA_GAP']):
         direction = -1
-    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
+    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:]) and diffextremas > configs['EXTREMA_GAP']):
         direction = 1
     return direction, extremas, ys
 
