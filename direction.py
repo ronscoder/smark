@@ -54,7 +54,7 @@ def _calculate(data):
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas, ys = get_extremas(closes, freqfact, order)
-    extremas_values = [ys[i] for i in range(extremas) if extremas[i]!=0]
+    extremas_values = [ys[i] for i in range(len(extremas)) if extremas[i]!=0]
     print('Closes[-2]-[-1]', ltp_change_pc)
     # print('extrema_window', extrema_window)
     diffextremas = 0
