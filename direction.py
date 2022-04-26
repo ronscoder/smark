@@ -57,14 +57,14 @@ def _calculate(data):
     extremas_values = [ys[i] for i in range(len(extremas)) if extremas[i]!=0]
     print('Closes[-2]-[-1]', ltp_change_pc)
     # print('extrema_window', extrema_window)
-    diffextremas = 0
+    if_good_extrema_gap = False
     if(len(extremas_values[-2:])>1):
-        diffextremas = abs(extremas_values[-1] - extremas_values[-2]) if extremas[-1] != extremas[-2] else 0
+        if_good_extrema_gap = abs(extremas_values[-1] - extremas_values[-2]) > configs['EXTREMA_GAP'] if extremas[-1] != extremas[-2] else True
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
-    return direction, extremas, ys, diffextremas > configs['EXTREMA_GAP']
+    return direction, extremas, ys, if_good_extrema_gap
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
