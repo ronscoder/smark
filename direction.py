@@ -43,37 +43,44 @@ def _calculate(data):
     extrema_window = configs['EXTREMA_WINDOW']
     closes = [d['close'] for d in data]
     opens = [d['open'] for d in data]
+
+    conditions = {}
     # mashort = mva(min(ma_periods), closes)
     # malong = mva(max(ma_periods), closes)
     ltp = closes[-1]
     # ftp = opens[-1]
 
     direction = None
-    ltp_change_pc = (ltp - opens[-extrema_window])/opens[-extrema_window]*100
-
+    ltp_change_pc = (ltp - opens[-1])/opens[-1]*100
+    print('ltp_change_pc', ltp_change_pc)
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     extremas, ys = get_extremas(closes, freqfact, order)
-    extremas_values = [ys[i] for i in range(len(extremas)) if extremas[i]!=0]
-    print('Closes[-2]-[-1]', ltp_change_pc)
+    extremas_values = [(extremas[i],ys[i]) for i in range(len(extremas)) if extremas[i]!=0]
     # print('extrema_window', extrema_window)
-    if_good_extrema_gap = False
+    # import pdb
+    # pdb.set_trace()
+    if_good_extrema_gap = True
     if(len(extremas_values[-2:])>1):
-        if_good_extrema_gap = abs(extremas_values[-1] - extremas_values[-2]) > configs['EXTREMA_GAP'] if extremas[-1] != extremas[-2] else True
+        if(extremas_values[-1][0] != extremas_values[-2][0]):
+            gap = abs(extremas_values[-1][1] - extremas_values[-2][1])
+            print('extrema gap', gap)
+            if(not gap > configs['EXTREMA_GAP']):
+                if_good_extrema_gap = False
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
         direction = 1
-    return direction, extremas, ys, if_good_extrema_gap
+    return direction, extremas, ys, if_good_extrema_gap, abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC']
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
         return
-    direction, extremas, ys, if_good_gap = _calculate(data)
+    direction, extremas, ys, if_good_gap, if_good_momentum = _calculate(data)
     print('BANKNIFTY_DIRECTION', direction, 'if_good_gap', if_good_gap)
     previous = ps1.get('BANKNIFTY_DIRECTION')
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap})
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'ltp_change_pc': if_good_momentum})
 
 
 if(__name__=='__main__'):

@@ -39,8 +39,8 @@ def getgraph(symbol):
     
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
-        direction, extremas, ys, if_good_gap = _calculate(histohlcs_offset)
-        print(direction, extremas)
+        direction, extremas, ys, if_good_gap, if_good_momentum = _calculate(histohlcs_offset)
+        print(direction, extremas, if_good_gap, if_good_momentum)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
@@ -59,7 +59,7 @@ def getgraph(symbol):
             # extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
             # direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
             # print(direction, extremas[:-5])
-            if(not direction is None and if_good_gap):
+            if(not direction is None and if_good_gap and if_good_momentum):
                 l = len(histohlcs_offset) - 1
                 fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
                         y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='red' if direction==-1 else 'green', width=2, dash='solid'), row=1, col=1)
