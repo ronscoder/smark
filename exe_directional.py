@@ -95,6 +95,8 @@ class Action:
                         if(if_good_gap):
                             insts = self.place_orders(direction)
                             print('try exe_directional', insts)
+                        else:
+                            print('Not good gap')
                     else:
                         print('Place order aborted due to recent directional exit')
                 except Exception as ex:

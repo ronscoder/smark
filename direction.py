@@ -59,7 +59,7 @@ def _calculate(data):
     # print('extrema_window', extrema_window)
     diffextremas = 0
     if(len(extremas_values[-2:])>1):
-        diffextremas = abs(extremas_values[-1] - extremas_values[-2])
+        diffextremas = abs(extremas_values[-1] - extremas_values[-2]) if extremas[-1] != extremas[-2] else 0
     if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
         direction = -1
     elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
