@@ -1,7 +1,7 @@
 from libs.configs import getConfig
 from libs.pubsub import get_ps_1
 import datetime
-from libs.utilities import ydownload
+from libs.utilities import ydownload, get_last_working_day
 
 p1 = get_ps_1('price recorder')
 
@@ -33,25 +33,6 @@ class OHLC:
                 self.high = max([self.high, ltp])
                 self.low = min([self.low, ltp])
                 self.close = ltp
-
-
-def is_holiday(date: datetime.date):
-    day = date.weekday()
-    if(day in [5, 6]):
-        return True
-    holidays = getConfig('holidays')
-    date_string = f'{date.year}{date.month:02}{date.day:02}'
-    if(date_string in holidays):
-        return True
-    return False
-
-
-def get_last_working_day():
-    today = datetime.datetime.today().date()
-    lastworkingday = today - datetime.timedelta(days=1)
-    while(is_holiday(lastworkingday)):
-        lastworkingday = lastworkingday - datetime.timedelta(days=1)
-    return lastworkingday
 
 
 class DayHistories:

@@ -4,6 +4,8 @@ import yfinance as yf
 
 import pickle
 
+from price_recorder import get_last_working_day
+
 file = f'sample/HISTORY_260105_{input("suffix: ")}'
 
 import os
@@ -15,7 +17,8 @@ if(os.path.exists(file)):
 else:
     mmdd = input('MMDD ')
     tdate1 = datetime(year=2022,month=int(mmdd[:2]), day=int(mmdd[2:]))
-    tdate2 = tdate1 - timedelta(days=1)
+    tdate2 = get_last_working_day(tdate1)
+    
     data = yf.download('^NSEBANK', start=tdate2, end=tdate1 + timedelta(days=1), interval='5m')
     history = [{'open':r['Open'], 'close': r['Close'], 'high': r['High'], 'low': r['Low']} for i, r in data.iterrows()]
     with open(file, 'wb') as f:

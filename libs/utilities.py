@@ -15,3 +15,13 @@ def is_holiday(date: datetime.date):
     if(date_string in holidays):
         return True
     return False
+
+
+
+def get_last_working_day(from_date = None):
+    if(from_date == None):
+        from_date = datetime.datetime.today().date()
+    lastworkingday = from_date - datetime.timedelta(days=1)
+    while(is_holiday(lastworkingday)):
+        lastworkingday = lastworkingday - datetime.timedelta(days=1)
+    return lastworkingday

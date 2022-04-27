@@ -7,7 +7,7 @@ import datetime
 from zoneinfo import ZoneInfo
 import numpy as np
 from scipy.signal import argrelextrema
-
+import pandas as pd
 
 
 def get_extremas(data, freqcutoff, order=12):
@@ -55,6 +55,7 @@ def _calculate(data):
     print('ltp_change_pc', ltp_change_pc)
     #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
+    # ys = mva(4, closes)
     extremas, ys = get_extremas(closes, freqfact, order)
     extremas_values = [(extremas[i],ys[i]) for i in range(len(extremas)) if extremas[i]!=0]
     # print('extrema_window', extrema_window)
@@ -75,23 +76,24 @@ def _calculate(data):
     # if price breaks all resistance
     if_resistance_broken = False
     raovs = [x for d, x in extremas_values if d==-1][-2:]
-    print('raovs', raovs, 'closes[-1]', closes[-1])
-    if(any([closes[-1] > r for r in raovs])):
-        if_resistance_broken = True
-        # print('closes', [close for close in closes[-extrema_window-1:-1]])
-        if(not all([close > aov for close in closes[-extrema_window:-1] for aov in raovs])):
+    # print('raovs', raovs, 'closes[-1]', closes[-1])
+    if(all([ close > aov for close in closes[-2:] for aov in raovs])):
+        print('resistance broken - apparent')
+        if(any([close < aov for close in closes[-4:-2] for aov in raovs])):
+            print('resistance broken confirmed')
+            if_resistance_broken = True
             direction = 1
-        print('if_resistance_broken', if_resistance_broken)
+    print('if_resistance_broken', if_resistance_broken)        
 
     # if price breaks all supports
     if_support_broken = False
     saovs = [x for d, x in extremas_values if d==1][-2:]
-    print('saovs', saovs)
-    if(any([closes[-1] < r for r in saovs])):
-        if_support_broken = True
-        if(not all([close > aov for close in closes[-extrema_window:-1] for aov in saovs])):
+    # print('raovs', raovs, 'closes[-1]', closes[-1])
+    if(all([ close < aov for close in closes[-2:] for aov in saovs])):
+        if(any([close > aov for close in closes[-4:-2] for aov in saovs])):
+            if_support_broken = True
             direction = -1
-        print('if_support_broken', if_support_broken)
+    print('if_support_broken', if_support_broken)        
 
     return direction, extremas, ys, if_good_extrema_gap, abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC'], if_resistance_broken, if_support_broken
 
