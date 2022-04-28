@@ -12,7 +12,7 @@ import pandas as pd
 
 def get_extremas(data, freqcutoff, order=12):
     freqfact = freqcutoff
-    ys = np.array(data)
+    yt = np.array(data)
     # if(freqfact == 0.0):
     #     ys = np.array(closes)
     # else:
@@ -20,91 +20,113 @@ def get_extremas(data, freqcutoff, order=12):
     #     print('number of frequencies', len(Yw))
     #     Yw[round(len(Yw)/freqfact):] = 0
     #     ys = np.fft.irfft(Yw, len(closes))
-    maxids = argrelextrema(ys, np.greater, order=order, mode='clip')[0]
-    minids = argrelextrema(ys, np.less, order=order, mode='clip')[0]
+    maxids = argrelextrema(yt, np.greater, order=order, mode='clip')[0]
+    minids = argrelextrema(yt, np.less, order=order, mode='clip')[0]
     # maxs = [(x, data[x]) for x in maxids]
     # mins = [(x, data[x]) for x in minids]
-    extremas = [0]*len(data)
+    extremas = [(0,0)]*len(data)
     for maxid in maxids:
-        extremas[maxid] = -1
+        extremas[maxid] = (-1, yt[maxid])
     for minid in minids:
-        extremas[minid] = 1
-    print('extremas', extremas)
-    return extremas, ys
+        extremas[minid] = (1, yt[minid])
+    # print('extremas', extremas)
+    return extremas, yt
 
 #TODO check the condition for every tick, or check with the last candle
 
 def _calculate(data):
-    # print('history', len(data))
     configs = getConfigs()
     ma_periods = configs['MA_PERIODS']
     order = configs['EXTREMA_ORDER']
     interval = configs['OHLC_MIN']
     extrema_window = configs['EXTREMA_WINDOW']
+    trend_angle = configs['TREND_ANGLE']
     closes = [d['close'] for d in data]
-    opens = [d['open'] for d in data]
-
-    conditions = {}
-    # mashort = mva(min(ma_periods), closes)
-    # malong = mva(max(ma_periods), closes)
-    # ltp = closes[-1]
-    # ftp = opens[-1]
-
+    params = {}
     direction = None
-    ltp_change_pc = (closes[-1] - opens[-1])/opens[-1]*100
-    print('ltp_change_pc', ltp_change_pc)
-    #max min
     freqfact = configs['FREQ_CUTOFF_FACTOR']
-    # ys = mva(4, closes)
-    extremas, ys = get_extremas(closes, freqfact, order)
-    extremas_values = [(extremas[i],ys[i]) for i in range(len(extremas)) if extremas[i]!=0]
-    # print('extrema_window', extrema_window)
-    # import pdb
-    # pdb.set_trace()
-    if_good_extrema_gap = True
-    if(len(extremas_values[-2:])>1):
-        if(extremas_values[-1][0] != extremas_values[-2][0]):
-            gap = abs(extremas_values[-1][1] - extremas_values[-2][1])
-            print('extrema gap', gap)
-            if(not gap > configs['EXTREMA_GAP']):
-                if_good_extrema_gap = False
-    if((-1 in extremas[-extrema_window:]) and not (1 in extremas[-extrema_window:])):
-        direction = -1
-    elif((1 in extremas[-extrema_window:]) and not (-1 in extremas[-extrema_window:])):
-        direction = 1
-    
-    # if price breaks all resistance
-    if_resistance_broken = False
-    raovs = [x for d, x in extremas_values if d==-1][-2:]
-    # print('raovs', raovs, 'closes[-1]', closes[-1])
-    if(all([ close > aov for close in closes[-2:] for aov in raovs])):
-        print('resistance broken - apparent')
-        if(any([close < aov for close in closes[-4:-2] for aov in raovs])):
-            print('resistance broken confirmed')
-            if_resistance_broken = True
-            direction = 1
-    print('if_resistance_broken', if_resistance_broken)        
+    yt = closes
+    extremas, _ = get_extremas(closes[:-extrema_window*5], freqfact, order)
+    params['extremas'] = extremas
+    params['yt'] = yt
 
-    # if price breaks all supports
-    if_support_broken = False
-    saovs = [x for d, x in extremas_values if d==1][-2:]
-    # print('raovs', raovs, 'closes[-1]', closes[-1])
-    if(all([ close < aov for close in closes[-2:] for aov in saovs])):
-        if(any([close > aov for close in closes[-4:-2] for aov in saovs])):
-            if_support_broken = True
-            direction = -1
-    print('if_support_broken', if_support_broken)        
+    maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+    maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+    minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+    minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
 
-    return direction, extremas, ys, if_good_extrema_gap, abs(ltp_change_pc) > configs['CANDLE_MOMENTUM_PC'], if_resistance_broken, if_support_broken
+    # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+    # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+    # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+    # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+
+    p_res = None
+    if(len(maximas_y)>0):
+        if(len(maximas_y)>1):
+            p_res = np.poly1d(np.polyfit(maximas_x, maximas_y, 1)) 
+        else:
+            p_res = np.poly1d([0,maximas_y[0]])
+    params['p_res'] = p_res
+    p_sup = None
+    if(len(minimas_y)>0):
+        if(len(minimas_y)>1):
+            p_sup = np.poly1d(np.polyfit(minimas_x, minimas_y, 1))
+        else:
+            p_sup = np.poly1d([0,minimas_y[0]])
+    params['p_sup'] = p_sup
+    std = round(np.std(yt[-(extrema_window*2):-1]))
+    params['std'] = std
+    # prev_closes1 = yt[-(extrema_window*2-1):-(extrema_window-1)]
+    prev_closes1 = yt[-extrema_window:-1]
+    ltp = yt[-1]
+    if(p_res is not None):
+        res = round(p_res(len(yt)))
+        if_around_res = any([res - std < x < res + std for x in prev_closes1])
+        print(res, res-std,prev_closes1,res+std)
+        if(if_around_res):
+            if(ltp < res - std):
+                direction = -1
+                print('resistance bounce')
+    if(p_sup is not None):
+        sup = round(p_sup(len(yt)))
+        if(any([sup - std < x < sup + std for x in prev_closes1])):
+            if(ltp > sup + std):
+                direction = 1
+                print('support bounce')
+
+    # breakouts
+    if(not None in (p_sup, p_res)):
+        m1 = p_res.c[0] if p_res.order > 0 else 0
+        m2 = p_sup.c[0] if p_sup.order > 0 else 0
+
+        m12 = m1 - m2
+        res = round(p_res(len(yt)))
+        sup = round(p_sup(len(yt)))
+        # print(m1, m2, 'm1-m2',m12)
+        if(m12 < -trend_angle):
+            # merging
+            # res breakout
+            if(any([res - std < x < res + std for x in prev_closes1])):
+                if(ltp > res + std):
+                    direction = 1
+                    print('resistance breakout')
+            # sup breakout
+            if(any([sup - std < x < sup + std for x in prev_closes1])):
+                if(ltp < sup - std):
+                    direction = -1
+                    print('support breakout')
+        
+
+
+    return direction, params
 
 def calculate(channel, data, ps1: PubSub):    
     if(data is None):
         return
-    direction, extremas, ys, if_good_gap, if_good_momentum, if_resistance_broken, if_support_broken = _calculate(data)
-    print('BANKNIFTY_DIRECTION', direction, 'if_good_gap', if_good_gap)
-    previous = ps1.get('BANKNIFTY_DIRECTION')
+    direction, params = _calculate(data)
+
     timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'extremas': extremas, 'previous':previous, 'if_good_gap': if_good_gap, 'if_good_momentum': if_good_momentum, 'if_resistance_broken':if_resistance_broken, 'if_support_broken':if_support_broken})
+    ps1.publish('BANKNIFTY_DIRECTION', {'timestamp': timestamp, 'direction': direction, 'params': params})
 
 
 if(__name__=='__main__'):

@@ -11,6 +11,7 @@ import plotly.express as px
 import pickle
 import os
 from direction import _calculate
+import numpy as np
 
 # r = r3 = get_ps_1('mdash')
 app = dash.Dash(__name__, title='MDashAoVs')
@@ -39,47 +40,82 @@ def getgraph(symbol):
     
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
-        direction, extremas, ys, if_good_gap, if_good_momentum, if_resistance_broken, if_support_broken = _calculate(histohlcs_offset)
-        print(direction, extremas, if_good_gap, if_good_momentum)
+        direction, params = _calculate(histohlcs_offset)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
         lows = [x['low'] for x in histohlcs]
+
         fig.add_trace(go.Candlestick(
             x=list(range(len(histohlcs))), open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
+        
+        fig.add_vline(x=len(histohlcs_offset)-1, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
 
-        # last_price = r.get(f'TICK_{260105}')
-        fig.add_shape(type='line', x0=len(histohlcs_offset)-1, x1=len(histohlcs_offset)-1, y0=min(lows) + (max(highs)-min(lows))/2,
-                      y1=min(lows), line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
-        # bankniftysignal = r.get('BANKNIFTY_DIRECTION')
-        # print(bankniftysignal)
-        # if(not bankniftysignal is None):
+        opens = [x['open'] for x in histohlcs_offset]
+        closes = [x['close'] for x in histohlcs_offset]
+        highs = [x['high'] for x in histohlcs_offset]
+        lows = [x['low'] for x in histohlcs_offset]
+
+        # p_move1 = np.poly1d(np.polyfit([x for x in range(3)], closes[-5:-2], 1))
+        # p_move2 = np.poly1d(np.polyfit([x for x in range(3)], closes[-3:], 1))
+
+        # fig.add_shape(type='line', x0=len(histohlcs_offset)-5, x1=len(histohlcs_offset)-5+2, y0=p_move1(0),  y1=p_move1(2), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+
+        # fig.add_shape(type='line', x0=len(histohlcs_offset)-3, x1=len(histohlcs_offset)-3+2, y0=p_move2(0),  y1=p_move2(2), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+
+        extremas = params['extremas']
+        # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
+        # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
+        # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1][-3:-1]
+        # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1][-3:-1]        
+
+        maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+        maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+        minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+        minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+
+        p_res = params['p_res']
+        std = params['std']
+        # print('std', std)
+        if(p_res is not None):
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset))+std, line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset))-std, line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+
+        p_sup = params['p_sup']
+        if(p_sup is not None):
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)), line=dict(color='red', width=3, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset))+std, line=dict(color='red', width=3, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset))-std, line=dict(color='red', width=3, dash='solid'), row=1, col=1)
+
         if(True):
-            # extremas = get_extremas(closes, freqfact, order)
-            # extremas = bankniftysignal['extremas'] if 'extremas' in bankniftysignal else None
-            # direction = bankniftysignal['direction'] if 'direction' in bankniftysignal else None
-            # print(direction, extremas[:-5])
-            if(direction ==1 and not if_support_broken and (if_good_momentum and (if_good_gap or if_resistance_broken))):
-                l = len(histohlcs_offset) - 1
-                fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
-                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='green', width=2, dash='solid'), row=1, col=1)
+            l = len(histohlcs_offset) - 1
+            if(direction ==1):
+                # fig.add_shape(type='line', x0=l, x1=l, y0=max(highs)+50,
+                #         y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='green', width=2, dash='solid'), row=1, col=1)
+                fig.add_vline(x = l,  line=dict(color='green', width=2, dash='solid'), row=1, col=1)
             
-            if(direction ==-1 and not if_resistance_broken and (if_good_momentum and (if_good_gap or if_support_broken))):
-                l = len(histohlcs_offset) - 1
-                fig.add_shape(type='line', x0=l, x1=l, y0=max(highs),
-                        y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+            if(direction ==-1):
+                fig.add_vline(x=l, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
                 
             if(extremas is not None):
-                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x==-1]
-                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x==1]
+                # print('extremas')
+                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x[0]==-1]
+                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x[0]==1]
                 for i,v in maximas:
                     fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
                         y1=v+50, line=dict(color='purple', width=10), row=1, col=1)
+                    # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
+                    #     y1=v+50, line=dict(color='purple', width=10), row=2, col=1)
                 for i,v in minimas:
                     fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
                         y1=v-50, line=dict(color='blue', width=10), row=1, col=1)
+                    # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
+                    #     y1=v-50, line=dict(color='blue', width=10), row=2, col=1)
             # if(ys is not None):
-            #     fig.add_trace(go.Scatter(y=ys))
+            #     fig.add_trace(go.Scatter(y=[h['close'] for h in histohlcs]), row=1, col=1)
+                # fig.add_trace(go.Scatter(y=ys), row=2, col=1)
         # fig.add_trace(go.Scatter(x=[i for i,x in extremasv], y=[x for i,x in extremasv], mode="markers"))
         # for i, extrema in enumerate(extremas):
         #     if(extrema == 1):

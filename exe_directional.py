@@ -8,13 +8,14 @@ from zoneinfo import ZoneInfo
 
 
 logging.basicConfig(filename="logs/place_orders.log", level=logging.DEBUG)
-ps1 = get_ps_1('exe directional')
-orderapi = Orderapi()
 
 class Action:
     def __init__(self) -> None:
         # self.configs = getConfigs()
         self.last_exit = 0
+        self.direction = None 
+        self.orderapi = Orderapi()
+        self.ps1 = get_ps_1('exe directional')
         
     def place_orders(self, direction):
         if(getConfig('HOLD_EXE')):
@@ -22,7 +23,7 @@ class Action:
             return
         # market window
         timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-        if(not (datetime.time(hour=9, minute=25) < timestamp.time() < datetime.time(hour=15, minute=5))):
+        if(not (datetime.time(hour=9, minute=15) < timestamp.time() < datetime.time(hour=15, minute=5))):
             print('Outside market time window')
             logging.info('Outside market time window')
             return
@@ -30,12 +31,6 @@ class Action:
         if(not getConfig('DIRECTIONAL_EXE')):
             print('Directional trade not activated')
             return
-
-        # if(not getTruthsOf('BANKNIFTY')):
-        #     return
-        # if(not getTruthsOf('GENERAL')):
-        #     return
-        # if(timestamp < direction['timestamp'] + datetime.timedelta(minutes=getConfig('OPEN_ORDER_EXPIRY_MIN'))):
         option = None
         inst = None
         if(direction == 1):    
@@ -46,7 +41,7 @@ class Action:
         if(not inst is None):
             option = inst[0]
             try:
-                orderapi.place_sl_buy_order(option, getConfig('NIFTYBANK_QTY'), 'NFO')
+                self.orderapi.place_sl_buy_order(option, getConfig('NIFTYBANK_QTY'), 'NFO')
             except Exception as ex:
                 print('Error placing orders')
                 print(ex.__str__())
@@ -54,20 +49,14 @@ class Action:
         
 
     def action(self, channcel, data):
-        direction = data['direction'] if 'direction' in data else None
-        previous = data['previous'] if 'previous' in data else None
-        if_good_gap = data['if_good_gap'] if 'if_good_gap' in data else None
-        if_good_momentum = data['if_good_momentum'] if 'if_good_momentum' in data else None
-        if_resistance_broken = data['if_resistance_broken'] if 'if_resistance_broken' in data else None
-        if_support_broken = data['if_support_broken'] if 'if_support_broken' in data else None
-
-        if(self.last_exit > 0):
-            self.last_exit -= 1
-        print('last exit CD', self.last_exit)
+        direction = self.direction = data['direction'] if 'direction' in data else None
         if(direction is None):
             return
-        print('PLACE ORDERS checking...')
-        oorders = orderapi.get_open_orders()
+        try:
+            oorders = self.orderapi.get_open_orders()
+        except Exception as ex:
+            print('[exe_directional] Error', ex.__str__())
+            return
         osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']    
         obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
         # if open sell order and direction doesnot match, exist
@@ -76,11 +65,8 @@ class Action:
                 position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
                 if(position_direction != direction):
                     #exit reversal
-                    orderapi.exit_all_positions([order])
-                    #TODO exclude taking new position for this direction for extrema_window = configs['EXTREMA_WINDOW']
-                    self.last_exit = getConfig('EXTREMA_WINDOW')
-                else:
-                    pass
+                    self.orderapi.exit_all_positions([order])
+                    return
         else:
             # no position
             if(len(obuyorders)>0):
@@ -88,51 +74,20 @@ class Action:
                     position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
                     if(position_direction != direction):
                     #exit reversal
-                        orderapi.cancel_open_buy_orders([order])
+                        self.orderapi.cancel_open_buy_orders([order])
                     else:
                         pass
             else:
                 # place new order
-                print('There is no position.', 'Placing new order...')
+                print('No position.', 'Placing new order...')
                 try:
-                    if(self.last_exit == 0):
-                        # if(if_good_momentum and (if_good_gap or if_resistance_broken or if_support_broken)):
-                        if((not if_support_broken and (if_good_momentum and (if_good_gap or if_resistance_broken))) or (not if_resistance_broken and (if_good_momentum and (if_good_gap or if_support_broken)))):
-                            insts = self.place_orders(direction)
-                            print('try exe_directional', insts)
-                        else:
-                            print('Not good gap')
-                    else:
-                        print('Place order aborted due to recent directional exit')
+                    insts = self.place_orders(direction)
+                    print('insts exe_directional', insts)
                 except Exception as ex:
                     print('Error placing orders')
                     print(ex.__str__())
-
-        # if(direction is not None):
-            
-        #     obuyorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'BUY']
-        #     if(len(obuyorders)>0):
-        #         if(direction == previous):
-        #             pass
-        #         else:
-        #             print('Cancelling reverse directional order')
-        #             orderapi.exit_all_positions()
-        #             orderapi.cancel_open_buy_orders()
-        #     osellorders = [x for x in oorders if x['status'] == 'TRIGGER PENDING' and x['transaction_type'] == 'SELL']                
-        #     if(len(osellorders) == 0):
-        #         #=> there is no open sell orders
-        #         print('There is no position.', 'Placing order...')
-        #         try:
-        #             insts = place_orders(direction)
-        #             print('exe_directional', insts)
-        #         except Exception as ex:
-        #             print('Error placing orders')
-        #             print(ex.__str__())
-        #     else:
-        #         pass
-
 if(__name__ == '__main__'):
     print('Directional place order started')
     action = Action()
-    ps1.subscribe(['BANKNIFTY_DIRECTION'], action.action)
+    action.ps1.subscribe(['BANKNIFTY_DIRECTION'], action.action)
 
