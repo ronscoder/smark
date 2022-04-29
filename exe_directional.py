@@ -46,10 +46,14 @@ class Action:
                 print('Error placing orders')
                 print(ex.__str__())
             return option
+        else:
+            print('No suitable option instrument found')
         
 
     def action(self, channcel, data):
         direction = self.direction = data['direction'] if 'direction' in data else None
+        timestamp = data['timestamp']
+        print('direction', timestamp, direction)
         if(direction is None):
             return
         try:
