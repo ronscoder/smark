@@ -74,7 +74,7 @@ def _calculate(data):
         else:
             p_sup = np.poly1d([0,minimas_y[0]])
     params['p_sup'] = p_sup
-    std = round(np.std(yt[-(extrema_window*2):-1]))
+    std = round(np.std(yt[-(extrema_window*2):-extrema_window]))
     params['std'] = std
     # prev_closes1 = yt[-(extrema_window*2-1):-(extrema_window-1)]
     prev_closes1 = yt[-extrema_window:-1]
@@ -82,7 +82,7 @@ def _calculate(data):
     if(p_res is not None):
         res = round(p_res(len(yt)))
         if_around_res = any([res - std < x < res + std for x in prev_closes1])
-        print(res, res-std,prev_closes1,res+std)
+        # print(res, res-std,prev_closes1,res+std)
         if(if_around_res):
             if(ltp < res - std):
                 direction = -1
@@ -102,7 +102,7 @@ def _calculate(data):
         m12 = m1 - m2
         res = round(p_res(len(yt)))
         sup = round(p_sup(len(yt)))
-        # print(m1, m2, 'm1-m2',m12)
+        print('m1-m2',m12)
         if(m12 < -trend_angle):
             # merging
             # res breakout
