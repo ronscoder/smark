@@ -69,7 +69,7 @@ def set_options(if_ce=True, if_pe=True):
     pe = None
 
     next_thursday_1 = get_next_thursday_date(0)
-    mdd_current_week = f'{today.month}{next_thursday_1.day:02}'
+    mdd_current_week = f'{next_thursday_1.month}{next_thursday_1.day:02}'
     # if(not (mdd_current_week == f'{today.month}{today.day:02}')):
     if(strikes['CURRENT_WEEK']['ALL']):
         low = atm - 40 * 100
@@ -89,7 +89,8 @@ def set_options(if_ce=True, if_pe=True):
     # pdb.set_trace()
     if(None in [ce, pe]):
         next_thursday_2 = get_next_thursday_date(1)
-        mdd_next_week = f'{today.month}{next_thursday_2.day:02}'
+
+        mdd_next_week = f'{next_thursday_2.month}{next_thursday_2.day:02}'
         if(strikes['NEXT_WEEK']['ALL']):
             low = atm - 40 * 100
             high = atm + 40 * 100
