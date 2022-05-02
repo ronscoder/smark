@@ -84,7 +84,7 @@ def _calculate(data):
         sup = round(p_sup(len(yt)-1))
         m2 = p_sup.c[0] if p_sup.order > 0 else 0
         print('m2', m2)
-        if(m2 > 5):
+        if(m2 > trend_angle):
             #uptrending
             if(any([sup - std < x < sup + std for x in prev_closes1])):
                 if(ltp > sup + std):
@@ -109,7 +109,7 @@ def _calculate(data):
         res = round(p_res(len(yt)-1))
         m1 = p_res.c[0] if p_res.order > 0 else 0
         print('m1', m1)
-        if(m2 < -5):
+        if(m2 < -trend_angle):
             #downtrending
             if(any([res - std < x < res + std for x in prev_closes1])):
                 if(ltp < res + std):
