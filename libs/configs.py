@@ -27,6 +27,19 @@ def on_snapshot(doc_snapshot, changes, read_time):
 
 # configref.on_snapshot(on_snapshot)
 
+def getRequestToken():
+    ref = db.collection(u'configs').document(u'request')
+    vals = ref.get().to_dict()
+    return vals['token'] if 'token' in vals else None
+
+def getAccessToken():
+    ref = db.collection(u'configs').document(u'access')
+    vals = ref.get().to_dict()
+    return vals['token'] if 'token' in vals else None
+
+def setAccessToken(val):
+    ref = db.collection(u'configs').document(u'access')
+    ref.set({'token': val})
 
 def getConfigs():
     return configref.get().to_dict()

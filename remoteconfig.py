@@ -19,7 +19,7 @@ init_firebase()
 
 db = firestore.client()
 # configs_ref = db.collection(u'configs').document(u'VIp4hCZGXPOqyJMNDc6H')
-access_ref = db.collection(u'configs').document(u'access')
+access_ref = db.collection(u'configs').document(u'request')
 # Create an Event for notifying main thread.
 
 callback_done = threading.Event()
@@ -33,12 +33,13 @@ callback_done = threading.Event()
 def on_access_snapshot(doc_snapshot, changes, read_time):
     for doc in doc_snapshot:
         configs = doc.to_dict()
-        if('request_token' in configs):
+        print(configs)
+        if('token' in configs):
             access_token = get_access_token()
             if(access_token is None):
                 # import pdb
                 # pdb.set_trace()
-                get_new_token(configs['request_token'])
+                get_new_token(configs['token'])
 
 # def getRemoteConfigs():
 #     doc = configs_ref.get()

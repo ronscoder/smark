@@ -46,7 +46,10 @@ def _calculate(data):
     direction = None
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     yt = closes
-    extremas, _ = get_extremas(closes[:-extrema_window*5], freqfact, order)
+    lyt = len(yt)
+    idx = lyt//extrema_window*extrema_window
+    print('idx', idx)
+    extremas, _ = get_extremas(closes[:idx], freqfact, order)
     params['extremas'] = extremas
     params['yt'] = yt
 
@@ -74,25 +77,42 @@ def _calculate(data):
         else:
             p_sup = np.poly1d([0,minimas_y[0]])
     params['p_sup'] = p_sup
-    std = round(np.std(yt[-(extrema_window*2):-extrema_window]))
+    
+    # std = round(np.std(yt[-(extrema_window*2):-extrema_window]))
+    std = round(np.std(yt[:((lyt//extrema_window*extrema_window))][-extrema_window:]))
     params['std'] = std
     # prev_closes1 = yt[-(extrema_window*2-1):-(extrema_window-1)]
     prev_closes1 = yt[-extrema_window:-1]
     ltp = yt[-1]
     if(p_res is not None):
-        res = round(p_res(len(yt)))
+        res = round(p_res(len(yt)-1))
+        m1 = p_res.c[0] if p_res.order > 0 else 0
+        print('m1', m1)
         if_around_res = any([res - std < x < res + std for x in prev_closes1])
         # print(res, res-std,prev_closes1,res+std)
-        if(if_around_res):
+        if(if_around_res and m1 > 0):
             if(ltp < res - std):
                 direction = -1
                 print('resistance bounce')
+        elif(m1<-5):
+            if(any([x < res for x in prev_closes1]) or any([res - std < x < res + std for x in prev_closes1])):
+                if(ltp > res + std):
+                    direction = 1
+                    print('resistance breakdown')                
     if(p_sup is not None):
-        sup = round(p_sup(len(yt)))
-        if(any([sup - std < x < sup + std for x in prev_closes1])):
+        sup = round(p_sup(len(yt)-1))
+        m2 = p_sup.c[0] if p_sup.order > 0 else 0
+        print('m2', m2)
+        # if(any([sup - std < x < sup + std for x in prev_closes1])):
+        if(any([sup - std < x < sup + std for x in prev_closes1]) and m2 < 0):
             if(ltp > sup + std):
                 direction = 1
                 print('support bounce')
+        elif(m2>5):
+            if(any([x > sup for x in prev_closes1]) or any([sup - std < x < sup + std for x in prev_closes1])):
+                if(ltp < sup - std):
+                    direction = -1
+                    print('support breakdown')
 
     # breakouts
     if(not None in (p_sup, p_res)):
@@ -100,8 +120,8 @@ def _calculate(data):
         m2 = p_sup.c[0] if p_sup.order > 0 else 0
 
         m12 = m1 - m2
-        res = round(p_res(len(yt)))
-        sup = round(p_sup(len(yt)))
+        res = round(p_res(len(yt)-1))
+        sup = round(p_sup(len(yt)-1))
         print('m1-m2',m12)
         if(m12 < -trend_angle):
             # merging

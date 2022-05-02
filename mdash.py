@@ -41,6 +41,7 @@ def getgraph(symbol):
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
         direction, params = _calculate(histohlcs_offset)
+        print(direction, params['std'])
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
@@ -78,16 +79,17 @@ def getgraph(symbol):
         std = params['std']
         # print('std', std)
         if(p_res is not None):
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset))+std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
 
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset), y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset))-std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
+
+            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
 
         p_sup = params['p_sup']
         if(p_sup is not None):
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset))+std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset), y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset))-std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
+            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
 
         if(True):
             l = len(histohlcs_offset) - 1

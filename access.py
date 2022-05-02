@@ -1,7 +1,7 @@
 import datetime
 import webbrowser
 from kiteconnect import KiteConnect
-from libs.configs import getConfig, setConfig
+from libs.configs import getAccessToken, getRequestToken, setAccessToken
 import subprocess
 # from boto.s3.connection import S3Connection
 import os
@@ -29,7 +29,7 @@ def get_new_token(request_token=None):
         access_token = data['access_token']
         val = f'{now.year}{now.month:02}{now.day:02}:{access_token}'
         print('new access token', val)
-        setConfig('ACCESS_TOKEN', val)
+        setAccessToken(val)
         # print('os.environ', os.environ)
         if('ON_HEROKU' in os.environ):
             os.environ['ACCESS_TOKEN'] = val
@@ -43,23 +43,26 @@ def get_new_token(request_token=None):
 
 def get_access_token():
     # print('ACCESS_TOKEN')
-    access_token = getConfig('ACCESS_TOKEN')
+    access_token = getAccessToken()
     # access_token = os.environ.get('ACCESS_TOKEN', None)
     # print(access_token)
-    request_token = getConfig('request_token')
-    print('request_token', request_token)
     if(access_token is None):
+        request_token = getRequestToken()
+        print('request_token', request_token)
         print('No access token. Getting new')
         access_token = get_new_token(request_token)
     if(access_token is None):
         print('Error getting access token')
         return
+    print('access_token', access_token)
     tokendatestr, token = access_token.split(":")
     tokendate = datetime.date(int(tokendatestr[:4]), int(
         tokendatestr[4:6]), int(tokendatestr[6:8]))
     today = datetime.date.today()
     if(today != tokendate):
         print('Access token expired.')
+        request_token = getRequestToken()
+        print('request_token', request_token)
         access_token = get_new_token(request_token)
     return token
 
