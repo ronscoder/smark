@@ -59,6 +59,11 @@ def _calculate(data):
     minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
     minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
 
+    # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+    # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+    # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+    # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+
     p_res = None
     if(len(maximas_y)>0):
         if(len(maximas_y)>1):
@@ -79,68 +84,69 @@ def _calculate(data):
     params['std'] = std
     # prev_closes1 = yt[-(extrema_window*2-1):-(extrema_window-1)]
     prev_closes1 = yt[-extrema_window:-1]
-    ltp = yt[-1]              
-    if(p_sup is not None):
-        sup = round(p_sup(len(yt)-1))
-        m2 = p_sup.c[0] if p_sup.order > 0 else 0
-        print('m2', m2)
-        if(m2 > 5):
-            #uptrending
-            if(any([sup - std < x < sup + std for x in prev_closes1])):
-                if(ltp > sup + std):
-                    direction = 1
-                    print('uptrend, support bounce')
-            if(any([sup - 3*std < x < sup for x in prev_closes1])):
-                print('support breaking down')
-                if(ltp < sup - 2*std):
-                    direction = -1
-                    print('uptrend, support breakdown')
-        # if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
-        #     if(sup < ltp < (sup + 2*std)):
-        #         direction = -1
-        #         print('support retreat')
-        # elif(m2>5):
-        #     if(any([x > sup for x in prev_closes1]) or any([sup - std < x < sup + std for x in prev_closes1])):
-        #         if(ltp < sup - 2*std):
-        #             direction = -1
-        #             print('support breakdown')
-
+    ltp = yt[-1]
     if(p_res is not None):
         res = round(p_res(len(yt)-1))
         m1 = p_res.c[0] if p_res.order > 0 else 0
         print('m1', m1)
-        if(m2 > 5):
-            #downtrending
-            if(any([res - std < x < res + std for x in prev_closes1])):
-                if(ltp < res + std):
-                    direction = -1
-                    print('downtrend, resistance bounce')
-            if(any([res - 3*std > x > res for x in prev_closes1])):
-                print('resistance breaking down')
-                if(ltp > res - 2*std):
-                    direction = 1
-                    print('downtrend, resistance breakdown')
-    # # breakouts
-    # if(not None in (p_sup, p_res)):
-    #     m1 = p_res.c[0] if p_res.order > 0 else 0
-    #     m2 = p_sup.c[0] if p_sup.order > 0 else 0
+        if_around_res = any([res - std < x < res + std for x in prev_closes1])
+        # print(res, res-std,prev_closes1,res+std)
+        # if(if_around_res and m1 < 0):
+        print('if_around_res', if_around_res, ltp, res - std)
+        if(if_around_res):
+            if(ltp < res - std):
+                direction = -1
+                print('resistance bounce')
 
-    #     m12 = m1 - m2
-    #     res = round(p_res(len(yt)-1))
-    #     sup = round(p_sup(len(yt)-1))
-    #     print('m1-m2',m12)
-    #     if(m12 < -trend_angle):
-    #         # merging
-    #         # res breakout
-    #         if(any([res - std < x < res + std for x in prev_closes1])):
-    #             if(ltp > res + std):
-    #                 direction = 1
-    #                 print('resistance breakout')
-    #         # sup breakout
-    #         if(any([sup - std < x < sup + std for x in prev_closes1])):
-    #             if(ltp < sup - std):
-    #                 direction = -1
-    #                 print('support breakout')
+        if(any([x < (res - 2*std) for x in prev_closes1]) and m1 > 0):
+            if(res > ltp > (res - 2*std)):
+                direction = 1
+                print('resistance retreat')                
+        elif(m1<-5):
+            if(any([x < res for x in prev_closes1]) or any([res - std < x < res + std for x in prev_closes1])):
+                if(ltp > res + 2*std):
+                    direction = 1
+                    print('resistance breakdown')                
+    if(p_sup is not None):
+        sup = round(p_sup(len(yt)-1))
+        m2 = p_sup.c[0] if p_sup.order > 0 else 0
+        print('m2', m2)
+        # if(any([sup - std < x < sup + std for x in prev_closes1])):
+        if(any([sup - std < x < sup + std for x in prev_closes1]) and m2 > 0):
+            if(ltp > sup + 2*std):
+                direction = 1
+                print('support bounce')
+        if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
+            if(sup < ltp < (sup + 2*std)):
+                direction = -1
+                print('support retreat')
+        elif(m2>5):
+            if(any([x > sup for x in prev_closes1]) or any([sup - std < x < sup + std for x in prev_closes1])):
+                if(ltp < sup - 2*std):
+                    direction = -1
+                    print('support breakdown')
+
+    # breakouts
+    if(not None in (p_sup, p_res)):
+        m1 = p_res.c[0] if p_res.order > 0 else 0
+        m2 = p_sup.c[0] if p_sup.order > 0 else 0
+
+        m12 = m1 - m2
+        res = round(p_res(len(yt)-1))
+        sup = round(p_sup(len(yt)-1))
+        print('m1-m2',m12)
+        if(m12 < -trend_angle):
+            # merging
+            # res breakout
+            if(any([res - std < x < res + std for x in prev_closes1])):
+                if(ltp > res + std):
+                    direction = 1
+                    print('resistance breakout')
+            # sup breakout
+            if(any([sup - std < x < sup + std for x in prev_closes1])):
+                if(ltp < sup - std):
+                    direction = -1
+                    print('support breakout')
         
 
 

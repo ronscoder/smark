@@ -65,22 +65,21 @@ def cb(channel, data, container = {}):
     if(not channel == f'TICK_{instrument_token}'):
         return    
     last_timestamp = container.get('last_timestamp', None)
-    timestamp = datetime.datetime.now()
+    timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
     if(last_timestamp is not None):
         tdelta = timestamp - last_timestamp
-        print('Trailing SL, time delta', tdelta)
         if(tdelta > datetime.timedelta(minutes = getConfig('OHLC_MIN'))):
+            print('Trailing SL, time delta', tdelta)
             container = {}
             try:
                 action(channel, data, position)
             except Exception as ex:
                 print('Error in trail sl')
                 print(ex.__str__())
-        else:
-            pass
-            #container['last_timestamp'] = timestamp
     else:
         container['last_timestamp'] = timestamp
+    if(timestamp > datetime.time(hour=15, minute=15)):
+        orderapi.exit_all_positions()
     
     
 if(__name__=='__main__'):

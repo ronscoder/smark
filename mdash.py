@@ -41,7 +41,7 @@ def getgraph(symbol):
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
         direction, params = _calculate(histohlcs_offset)
-        print(direction, params['std'])
+        print('direction', direction, 'std', params['std'])
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
