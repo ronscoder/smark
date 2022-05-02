@@ -109,7 +109,7 @@ def _calculate(data):
         res = round(p_res(len(yt)-1))
         m1 = p_res.c[0] if p_res.order > 0 else 0
         print('m1', m1)
-        if(m2 > 5):
+        if(m2 < -5):
             #downtrending
             if(any([res - std < x < res + std for x in prev_closes1])):
                 if(ltp < res + std):
