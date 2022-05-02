@@ -90,10 +90,15 @@ def _calculate(data):
         print('m1', m1)
         if_around_res = any([res - std < x < res + std for x in prev_closes1])
         # print(res, res-std,prev_closes1,res+std)
-        if(if_around_res and m1 > 0):
+        if(if_around_res and m1 < 0):
             if(ltp < res - 2*std):
                 direction = -1
                 print('resistance bounce')
+
+        if(any([x < (res - 2*std) for x in prev_closes1]) and m1 > 0):
+            if(ltp > (res - 2*std)):
+                direction = 1
+                print('resistance retreat')                
         elif(m1<-5):
             if(any([x < res for x in prev_closes1]) or any([res - std < x < res + std for x in prev_closes1])):
                 if(ltp > res + std):
@@ -104,10 +109,14 @@ def _calculate(data):
         m2 = p_sup.c[0] if p_sup.order > 0 else 0
         print('m2', m2)
         # if(any([sup - std < x < sup + std for x in prev_closes1])):
-        if(any([sup - std < x < sup + std for x in prev_closes1]) and m2 < 0):
+        if(any([sup - std < x < sup + std for x in prev_closes1]) and m2 > 0):
             if(ltp > sup + 2*std):
                 direction = 1
                 print('support bounce')
+        if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
+            if(ltp < (sup + 2*std)):
+                direction = -1
+                print('support retreat')
         elif(m2>5):
             if(any([x > sup for x in prev_closes1]) or any([sup - std < x < sup + std for x in prev_closes1])):
                 if(ltp < sup - std):
