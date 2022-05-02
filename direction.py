@@ -91,7 +91,7 @@ def _calculate(data):
         if_around_res = any([res - std < x < res + std for x in prev_closes1])
         # print(res, res-std,prev_closes1,res+std)
         if(if_around_res and m1 > 0):
-            if(ltp < res - std):
+            if(ltp < res - 2*std):
                 direction = -1
                 print('resistance bounce')
         elif(m1<-5):
@@ -105,7 +105,7 @@ def _calculate(data):
         print('m2', m2)
         # if(any([sup - std < x < sup + std for x in prev_closes1])):
         if(any([sup - std < x < sup + std for x in prev_closes1]) and m2 < 0):
-            if(ltp > sup + std):
+            if(ltp > sup + 2*std):
                 direction = 1
                 print('support bounce')
         elif(m2>5):
