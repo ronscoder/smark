@@ -90,11 +90,11 @@ def _calculate(data):
                 if(ltp > sup + std):
                     direction = 1
                     print('uptrend, support bounce')
-            if(any([sup - 3*std < x < sup for x in prev_closes1])):
-                print('support breaking down')
-                if(ltp < sup - 2*std):
-                    direction = -1
-                    print('uptrend, support breakdown')
+        if(any([sup - 3*std < x < sup for x in prev_closes1])):
+            print('support breaking down')
+            if(ltp < sup - 2*std):
+                direction = -1
+                print('uptrend, support breakdown')
         # if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
         #     if(sup < ltp < (sup + 2*std)):
         #         direction = -1
@@ -115,11 +115,11 @@ def _calculate(data):
                 if(ltp < res + std):
                     direction = -1
                     print('downtrend, resistance bounce')
-            if(any([res - 3*std > x > res for x in prev_closes1])):
-                print('resistance breaking down')
-                if(ltp > res - 2*std):
-                    direction = 1
-                    print('downtrend, resistance breakdown')
+        if(any([res - 3*std > x > res for x in prev_closes1])):
+            print('resistance breaking down')
+            if(ltp > res - 2*std):
+                direction = 1
+                print('downtrend, resistance breakdown')
     # # breakouts
     # if(not None in (p_sup, p_res)):
     #     m1 = p_res.c[0] if p_res.order > 0 else 0
