@@ -78,7 +78,7 @@ def cb(channel, data, container = {}):
                 print(ex.__str__())
     else:
         container['last_timestamp'] = timestamp
-    if(timestamp > datetime.time(hour=15, minute=15)):
+    if(timestamp.time() > datetime.time(hour=15, minute=15)):
         orderapi.exit_all_positions()
     
     
