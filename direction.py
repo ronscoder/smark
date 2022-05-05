@@ -90,7 +90,7 @@ def _calculate(data):
         if(m2 > trend_angle):
             #uptrending
             if(any([sup - std < x < sup + std for x in prev_closes1])):
-                if(ltp > sup + std):
+                if(ltp > sup + sd_bdfactor/2*std):
                     direction = 1
                     print('uptrend, support bounce')
         if(any([sup - (sd_bdfactor+1)*std < x < sup for x in prev_closes1])):
@@ -98,15 +98,6 @@ def _calculate(data):
             if(ltp < sup - sd_bdfactor*std):
                 direction = -1
                 print('uptrend, support breakdown')
-        # if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
-        #     if(sup < ltp < (sup + 2*std)):
-        #         direction = -1
-        #         print('support retreat')
-        # elif(m2>5):
-        #     if(any([x > sup for x in prev_closes1]) or any([sup - std < x < sup + std for x in prev_closes1])):
-        #         if(ltp < sup - 2*std):
-        #             direction = -1
-        #             print('support breakdown')
 
     if(p_res is not None):
         res = round(p_res(len(yt)-1))
@@ -115,7 +106,7 @@ def _calculate(data):
         if(m2 < -trend_angle):
             #downtrending
             if(any([res - std < x < res + std for x in prev_closes1])):
-                if(ltp < res - std):
+                if(ltp < res - sd_bdfactor/2*std):
                     direction = -1
                     print('downtrend, resistance bounce')
         if(any([res - (sd_bdfactor+1)*std > x > res for x in prev_closes1])):

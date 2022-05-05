@@ -11,7 +11,7 @@ while(True):
             histohlcs = pickle.load(f)
     direction = None
     for i in range(len(histohlcs)):
-        data = histohlcs[:-(i+1)]
+        data = histohlcs[:-(i+1+offset+1)]
         direction, params = _calculate(data)
         if(direction != None):
             print('direction', direction, 'index', len(data)-1)
