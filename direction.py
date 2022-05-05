@@ -41,13 +41,16 @@ def _calculate(data):
     interval = configs['OHLC_MIN']
     extrema_window = configs['EXTREMA_WINDOW']
     trend_angle = configs['TREND_ANGLE']
+    extrema_offset_factor = configs['EXTREMA_OFFSET_FACTOR']
+    sd_bdfactor = configs['SD_BDFACTOR']
+    sd_calcoffset_factor = configs['SD_CALC_OFFSET_FACTOR']
     closes = [d['close'] for d in data]
     params = {}
     direction = None
     freqfact = configs['FREQ_CUTOFF_FACTOR']
     yt = closes
     lyt = len(yt)
-    idx = lyt//extrema_window*extrema_window
+    idx = lyt//(extrema_offset_factor*extrema_window)*(extrema_offset_factor*extrema_window)
     print('idx', idx)
     extremas, _ = get_extremas(closes[:idx], freqfact, order)
     # extremas, _ = get_extremas(closes[:idx], freqfact, order)
@@ -75,7 +78,7 @@ def _calculate(data):
     params['p_sup'] = p_sup
     
     # std = round(np.std(yt[-(extrema_window*2):-extrema_window]))
-    std = round(np.std(yt[:((lyt//extrema_window*extrema_window))][-extrema_window:]))
+    std = round(np.std(yt[:((lyt//extrema_window*extrema_window))][-(sd_calcoffset_factor*extrema_window):]))
     params['std'] = std
     # prev_closes1 = yt[-(extrema_window*2-1):-(extrema_window-1)]
     prev_closes1 = yt[-extrema_window:-1]
@@ -90,9 +93,9 @@ def _calculate(data):
                 if(ltp > sup + std):
                     direction = 1
                     print('uptrend, support bounce')
-        if(any([sup - 3*std < x < sup for x in prev_closes1])):
+        if(any([sup - (sd_bdfactor+1)*std < x < sup for x in prev_closes1])):
             print('support breaking down')
-            if(ltp < sup - 2*std):
+            if(ltp < sup - sd_bdfactor*std):
                 direction = -1
                 print('uptrend, support breakdown')
         # if(any([x > (sup + 2*std) for x in prev_closes1]) and m2 < 0):
@@ -115,9 +118,9 @@ def _calculate(data):
                 if(ltp < res + std):
                     direction = -1
                     print('downtrend, resistance bounce')
-        if(any([res - 3*std > x > res for x in prev_closes1])):
+        if(any([res - (sd_bdfactor+1)*std > x > res for x in prev_closes1])):
             print('resistance breaking down')
-            if(ltp > res - 2*std):
+            if(ltp > res - sd_bdfactor*std):
                 direction = 1
                 print('downtrend, resistance breakdown')
     # # breakouts
