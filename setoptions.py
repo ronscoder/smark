@@ -14,28 +14,28 @@ def get_next_thursday_date(week=0):
     return date
 
 def filter_ce(ltps, price_range):
-    for ltp in ltps:
-        print(ltp, ltps[ltp]['last_price'])
+    # for ltp in ltps:
+    #     print(ltp, ltps[ltp]['last_price'])
     celtps = [(x, ltps[x]) for x in ltps if x[-2:] == 'CE']
     celtps = [x for x in sorted(celtps, key=lambda x: x[1]['last_price']) if (
         price_range[0] <= x[1]['last_price'] <= price_range[1])]
     if(len(celtps) > 0):
-        for ce in celtps:
-            print(ce[0], ce[1]['last_price'])
+        # for ce in celtps:
+        #     print(ce[0], ce[1]['last_price'])
         print(celtps[-1])
         # symbol, token
         ce = (celtps[-1][0][4:], celtps[-1][1]['instrument_token'])
         return ce
 
 def filter_pe(ltps, price_range):
-    for ltp in ltps:
-        print(ltp, ltps[ltp]['last_price'])    
+    # for ltp in ltps:
+    #     print(ltp, ltps[ltp]['last_price'])    
     peltps = [(x, ltps[x]) for x in ltps if x[-2:] == 'PE']
     peltps = [x for x in sorted(peltps, key=lambda x: x[1]['last_price']) if (
         price_range[0] <= x[1]['last_price'] <= price_range[1])]
     if(len(peltps) > 0):
-        for pe in peltps:
-            print(pe[0], pe[1]['last_price'])
+        # for pe in peltps:
+        #     print(pe[0], pe[1]['last_price'])
         print(peltps[-1])
         pe = (peltps[-1][0][4:], peltps[-1][1]['instrument_token'])
         return pe

@@ -115,7 +115,7 @@ def _calculate(data):
         if(m2 < -trend_angle):
             #downtrending
             if(any([res - std < x < res + std for x in prev_closes1])):
-                if(ltp < res + std):
+                if(ltp < res - std):
                     direction = -1
                     print('downtrend, resistance bounce')
         if(any([res - (sd_bdfactor+1)*std > x > res for x in prev_closes1])):
