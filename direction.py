@@ -34,6 +34,69 @@ def get_extremas(data, freqcutoff, order=12):
 
 #TODO check the condition for every tick, or check with the last candle
 
+def get_training_data(data):
+    configs = getConfigs()
+    ma_periods = configs['MA_PERIODS']
+    order = configs['EXTREMA_ORDER']
+    interval = configs['OHLC_MIN']
+    extrema_window = configs['EXTREMA_WINDOW']
+    trend_angle = configs['TREND_ANGLE']
+    extrema_offset_factor = configs['EXTREMA_OFFSET_FACTOR']
+    sd_bdfactor = configs['SD_BDFACTOR']
+    sd_calcoffset_factor = configs['SD_CALC_OFFSET_FACTOR']
+    closes = [d['close'] for d in data]
+    
+    params = {}
+
+    freqfact = configs['FREQ_CUTOFF_FACTOR']
+
+    ltp = closes[-1]
+
+    yt = [x - ltp for x in closes]
+    lyt = len(yt)
+    idx = lyt//(extrema_offset_factor*extrema_window)*(extrema_offset_factor*extrema_window)
+    print('idx', idx)
+    extremas, _ = get_extremas(yt[:idx], freqfact, order)
+
+    maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+    maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+    minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+    minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+
+    res_coeffs = [0,0]
+    if(len(maximas_y)>0):
+        if(len(maximas_y)>1):
+            res_coeffs = np.polyfit(maximas_x, maximas_y, 1)
+        else:
+            res_coeffs = [0, maximas_y[-1]]
+    else:
+        res_coeffs = [0, max(yt)]
+ 
+    params['res_coeffs'] = res_coeffs
+
+    sup_coeffs = [0,0]
+    if(len(minimas_y)>0):
+        if(len(minimas_y)>1):
+            sup_coeffs = np.polyfit(minimas_x, minimas_y, 1)
+        else:
+            sup_coeffs = [0, minimas_y[-1]]
+    else:
+        sup_coeffs = [0, min(yt)]
+ 
+    params['sup_coeffs'] = sup_coeffs
+
+    std = round(np.std(yt[:((lyt//extrema_window*extrema_window))][-(sd_calcoffset_factor*extrema_window):]))
+    params['std'] = std
+
+    x1 = lyt - extrema_offset_factor*extrema_window - 1
+    x2 = lyt
+    xlist = [x for x in range(x1,x2)]
+    price_coeffs = np.polyfit(xlist, yt[x1:x2], 2)
+    # print(price_coeffs)
+    params['price_coeffs'] = price_coeffs
+
+    return params
+
 def _calculate(data):
     configs = getConfigs()
     ma_periods = configs['MA_PERIODS']

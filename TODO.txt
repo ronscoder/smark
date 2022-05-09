@@ -1,1 +1,7 @@
-Replace redis with firestore
+DONE    Replace redis with firestore
+
+The current job turns into a death end.
+I must do something. I must not depend on this job. 
+
+UNEMPLOYED.
+NEXT TODO:::?

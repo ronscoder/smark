@@ -10,7 +10,7 @@ import plotly.express as px
 # from direction import get_extremas
 import pickle
 import os
-from direction import _calculate
+from direction import _calculate, get_training_data
 import numpy as np
 
 # r = r3 = get_ps_1('mdash')
@@ -56,7 +56,23 @@ def getgraph(symbol):
         closes = [x['close'] for x in histohlcs_offset]
         highs = [x['high'] for x in histohlcs_offset]
         lows = [x['low'] for x in histohlcs_offset]
+        
+        # x1 = len(histohlcs_offset) - 2*5 - 1
+        # x2 = len(histohlcs_offset)
+        # xlist = [x for x in range(x1,x2)]
+        # p_price_shape = np.poly1d(np.polyfit(xlist, closes[x1:x2], 2))
+        # print(p_price_shape.c)
 
+        # tparams = get_training_data(histohlcs_offset)
+        # price_coeffs = tparams['price_coeffs']
+        # p_price_shape1 = np.poly1d(price_coeffs)
+        # extrema_offset_factor = 3
+        # extrema_window = 5
+        # x1 = len(histohlcs_offset) - extrema_offset_factor*extrema_window - 1
+        # x2 = len(histohlcs_offset)
+        # xlist = [x for x in range(x1,x2)]
+        # fig.add_trace(go.Scatter(x=xlist, y=[p_price_shape1(x)-100 for x in range(x1,x2)], 
+        # line=dict(color='green', width=1, dash='solid'), mode='lines'), row=1, col=1)
         # p_move1 = np.poly1d(np.polyfit([x for x in range(3)], closes[-5:-2], 1))
         # p_move2 = np.poly1d(np.polyfit([x for x in range(3)], closes[-3:], 1))
 

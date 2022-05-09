@@ -2,6 +2,7 @@ from libs.configs import getConfig
 from libs.pubsub import get_ps_1
 import datetime
 from libs.utilities import ydownload, get_last_working_day
+from zoneinfo import ZoneInfo
 
 p1 = get_ps_1('price recorder')
 
@@ -18,15 +19,15 @@ class OHLC:
         self.interval = getConfig('OHLC_MIN')
 
     def feed(self, tick):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         ltp = tick['last_price']
         if(self.dt == None):
             self.dt = now
             self.high = self.low = self.open = self.close = ltp
         else:
-            if(now > self.dt + datetime.timedelta(minutes=self.interval)):
+            if(now > self.dt + datetime.timedelta(minutes=self.interval) and now.time() >= datetime.time(hour=9, minute=15)):
                 self.history.append({
-                    'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close})
+                    'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close, 'timestamp': self.dt})
                 self.dt = None
                 p1.publish(f'HISTORY_{self.token}', self.history)
             else:
