@@ -296,6 +296,7 @@ def _calculate2(data):
     return direction, params
 
 def calculate(channel, data, ps1: PubSub):    
+    print('calc...')
     if(data is None):
         return
     direction, params = _calculate(data)

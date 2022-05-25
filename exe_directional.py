@@ -13,7 +13,7 @@ class Action:
     def __init__(self) -> None:
         # self.configs = getConfigs()
         self.last_exit = 0
-        self.direction = None 
+        self.direction = 0 
         self.orderapi = Orderapi()
         self.ps1 = get_ps_1('exe directional')
         
@@ -51,7 +51,7 @@ class Action:
         
 
     def action(self, channcel, data):
-        direction = self.direction = data['direction'] if 'direction' in data else None
+        direction = self.direction = data['direction'] if 'direction' in data else 0
         timestamp = data['timestamp']
         print('direction', timestamp, direction)
         if(direction is None):
