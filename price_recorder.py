@@ -21,6 +21,7 @@ class OHLC:
     def feed(self, tick):
         now = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         ltp = tick['last_price']
+        print('ltp', ltp)
         if(self.dt == None):
             self.dt = now
             self.high = self.low = self.open = self.close = ltp
@@ -29,6 +30,7 @@ class OHLC:
                 self.history.append({
                     'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close, 'timestamp': self.dt})
                 self.dt = None
+                print('publishing history')
                 p1.publish(f'HISTORY_{self.token}', self.history)
             else:
                 self.high = max([self.high, ltp])

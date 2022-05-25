@@ -54,7 +54,7 @@ class Action:
         direction = self.direction = data['direction'] if 'direction' in data else 0
         timestamp = data['timestamp']
         print('direction', timestamp, direction)
-        if(direction is None):
+        if(direction == 0):
             return
         try:
             oorders = self.orderapi.get_open_orders()
