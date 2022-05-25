@@ -117,7 +117,7 @@ def _calculate(data):
 
     direction = 0
     
-    pc_changed = (closes[-1]-closes[0])/closes[0]
+    pc_changed = ((closes[-1]-closes[0])/closes[0])*100
     params['pc_changed'] = pc_changed
     if(pc_changed > CANDLE_MOMENTUM_PC):
         direction = 1
