@@ -100,6 +100,34 @@ def get_training_data(data):
 
 def _calculate(data):
     configs = getConfigs()
+    # ma_periods = configs['MA_PERIODS']
+    # order = configs['EXTREMA_ORDER']
+    # interval = configs['OHLC_MIN']
+    extrema_window = configs['EXTREMA_WINDOW']
+    CANDLE_MOMENTUM_PC = configs['CANDLE_MOMENTUM_PC']
+    # trend_angle = configs['TREND_ANGLE']
+    # extrema_offset_factor = configs['EXTREMA_OFFSET_FACTOR']
+    # sd_bdfactor = configs['SD_BDFACTOR']
+    # sd_calcoffset_factor = configs['SD_CALC_OFFSET_FACTOR']
+    closes = [d['close'] for d in data[:-extrema_window]]
+    
+
+    params = {}
+    params['extrema_window'] = extrema_window
+
+    direction = 0
+    
+    pc_changed = (closes[-1]-closes[0])/closes[0]
+    params['pc_changed'] = pc_changed
+    if(pc_changed > CANDLE_MOMENTUM_PC):
+        direction = 1
+    if(pc_changed < -CANDLE_MOMENTUM_PC):
+        direction = -1
+
+
+    return direction, params
+def _calculate3(data):
+    configs = getConfigs()
     ma_periods = configs['MA_PERIODS']
     order = configs['EXTREMA_ORDER']
     interval = configs['OHLC_MIN']
