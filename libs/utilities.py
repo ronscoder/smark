@@ -1,9 +1,10 @@
 import yfinance as yf
 import datetime
 
-def ydownload(symbol, startdate, enddate, interval='5m'):
-    return yf.download(symbol, start=startdate,
-                                    end=enddate, interval=interval)
+def ydownload(symbol, startdate, enddate=None, interval='5m'):
+    if(enddate==None):
+        enddate = datetime.datetime.today().date()
+    return yf.download(symbol, start=f'{startdate.year}-{startdate.month:02}-{startdate.day:02}', end=f'{enddate.year}-{enddate.month:02}-{enddate.day:02}', interval=interval)
 
 def is_holiday(date: datetime.date):
     day = date.weekday()
@@ -18,10 +19,10 @@ def is_holiday(date: datetime.date):
 
 
 
-def get_last_working_day(from_date = None):
+def get_last_working_day(from_date = None, days_offset=1):
     if(from_date == None):
         from_date = datetime.datetime.today().date()
-    lastworkingday = from_date - datetime.timedelta(days=1)
+    lastworkingday = from_date - datetime.timedelta(days=days_offset)
     while(is_holiday(lastworkingday)):
         lastworkingday = lastworkingday - datetime.timedelta(days=1)
     return lastworkingday

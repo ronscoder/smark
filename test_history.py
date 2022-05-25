@@ -12,6 +12,7 @@ if(os.path.exists(file)):
     with open(file, 'rb') as f:
         history = pickle.load(f)
 else:
+    print('fetching data')
     history = ps1.get('HISTORY_260105')
     with open(file, 'wb') as f:
         pickle.dump(history, f)
@@ -21,6 +22,7 @@ while(True):
         print('length', len(history))
         offset = int(input('upto: '))
         if(offset == 0):
+            print('fetching data')
             history = ps1.get('HISTORY_260105')
             data = history
         else:

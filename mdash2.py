@@ -14,7 +14,7 @@ from direction import _calculate, get_training_data
 import numpy as np
 
 # r = r3 = get_ps_1('mdash')
-app = dash.Dash(__name__, title='MDashAoVs')
+app = dash.Dash(__name__, title='MDash2AoVs')
 
 symbols = [['NIFTY BANK', 260105, '^NSEBANK', 'INDEX'],]
 instruments = [{'symbol': x[0], 'token': x[1], 'ysymbol': x[2], 'type': x[3]}
@@ -41,26 +41,51 @@ def getgraph(symbol):
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
         direction, params = _calculate(histohlcs_offset)
-        print('direction', direction, 'std', params['std'])
+        direction = 0
+        # print('direction', direction, 'std', params['std'])
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
         lows = [x['low'] for x in histohlcs]
-        # labels = [x['timestamp'] for x in histohlcs]
-        print(histohlcs[-1])
+        # print(histohlcs[-1])
         fig.add_trace(go.Candlestick(
             x=list(range(len(histohlcs))), open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
         # fig.add_trace(go.Candlestick(
-        #     x=labels, open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
-        # fig.add_trace(go.Candlestick(
         #     x=[v['timestamp'] for v in histohlcs], open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
         
-        fig.add_vline(x=len(histohlcs_offset)-1, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
+        n = 10
+        offset = 5
 
-        opens = [x['open'] for x in histohlcs_offset]
+        fig.add_vline(x=len(histohlcs_offset)-1, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
+        fig.add_vline(x=len(histohlcs_offset)-1-offset, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
+        fig.add_vline(x=len(histohlcs_offset)-1-n-offset, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
+        
         closes = [x['close'] for x in histohlcs_offset]
-        highs = [x['high'] for x in histohlcs_offset]
-        lows = [x['low'] for x in histohlcs_offset]
+        ltp = closes[-1]
+        data = closes[-n:]          
+
+        data = closes[-(n+offset):-offset]
+        std = np.std(closes[-(n+offset):-2])
+        x0 = len(closes)-1-(n+offset)
+        x1 = len(closes)-1
+        ymax = max(data) + std
+        ymin = min(data) - std
+        fig.add_shape(type='line', x0=x0, x1=x1, y0=ymax,  y1=ymax, line=dict(color='red', width=2, dash='dot'), row=1, col=1)
+        fig.add_shape(type='line', x0=x0, x1=x1, y0=ymin,  y1=ymin, line=dict(color='red', width=2, dash='dot'), row=1, col=1)
+
+        fig.add_shape(type='line', x0=x0, x1=x1, y0=ymax-std,  y1=ymax-std, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+        fig.add_shape(type='line', x0=x0, x1=x1, y0=ymin + std,  y1=ymin + std, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+
+        # fig.add_annotation(x=len(histohlcs_offset)-1, y=max(highs),
+        #     text=f"up:{round(ups/(ups+downs),1)} down:{round(downs/(ups+downs),1)}",
+        #     showarrow=True,
+        #     arrowhead=1)
+
+        if(ltp > ymax + std):
+            direction = 1
+            #TODO avoid if ymax - ymin > certain value
+        if(ltp < ymin - std):
+            direction = -1
         
         # x1 = len(histohlcs_offset) - 2*5 - 1
         # x2 = len(histohlcs_offset)
@@ -91,26 +116,26 @@ def getgraph(symbol):
         # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1][-3:-1]
         # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1][-3:-1]        
 
-        maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
-        maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
-        minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
-        minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+        # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+        # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+        # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+        # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
 
-        p_res = params['p_res']
-        std = params['std']
-        # print('std', std)
-        if(p_res is not None):
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
+        # p_res = params['p_res']
+        # std = params['std']
+        # # print('std', std)
+        # if(p_res is not None):
+        #     fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
 
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='dot'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
 
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='dot'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
 
-        p_sup = params['p_sup']
-        if(p_sup is not None):
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='dot'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='dot'), row=1, col=1)
+        # p_sup = params['p_sup']
+        # if(p_sup is not None):
+        #     fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
 
         if(True):
             l = len(histohlcs_offset) - 1
@@ -196,4 +221,4 @@ if(__name__ == '__main__'):
     print('running...')
     # app.
     # run_server(app)
-    app.run_server(debug=True, port='8053')
+    app.run_server(debug=True, port='8052')

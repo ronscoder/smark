@@ -54,7 +54,7 @@ class NeuralNetwork(nn.Module):
         return self.forward(x)
 
 # from peewee import *
-from training_data import TrainingDataModel
+from dbmodel import TrainingDataModel
 if(__name__=='__main__'):
     while(True):
         # X = []

@@ -1,38 +1,14 @@
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 import yfinance as yf
 from direction import get_training_data
-
-
+from datetime import datetime
+import pandas as pd
 import pickle
 
 from libs.utilities import get_last_working_day
 
-
-from peewee import *
-db = SqliteDatabase('./local/training.db')
-
-
-class TrainingDataModel2(Model):
-    created_at = DateTimeField(default=datetime.now)
-    res_coeffs_0 = FloatField()
-    res_coeffs_1 = FloatField()
-    sup_coeffs_0 = FloatField()
-    sup_coeffs_1 = FloatField()
-    price_coeffs_0 = FloatField()
-    price_coeffs_1 = FloatField()
-    price_coeffs_2 = FloatField()
-    long = IntegerField()
-    short = IntegerField()
-    wait = IntegerField()
-    if_trained = BooleanField(default=False)
-    class Meta:
-        database = db # This model uses the "training.db" database.
-
-if(db.table_exists(TrainingDataModel2)):
-    pass
-else:
-    db.create_tables([TrainingDataModel2])
-
+from dbmodel import db, TrainingDataModel
 
 db.connect(reuse_if_open=True)
 
@@ -51,14 +27,14 @@ def get_history():
         tdate2 = get_last_working_day(tdate1)
         
         data = yf.download('^NSEBANK', start=tdate2, end=tdate1 + timedelta(days=1), interval='5m')
-        history = [{'open':r['Open'], 'close': r['Close'], 'high': r['High'], 'low': r['Low']} for i, r in data.iloc[:-1].iterrows()]
+        history = [{'open':r['Open'], 'close': r['Close'], 'high': r['High'], 'low': r['Low'], 'timestamp':i.to_pydatetime()} for i, r in data.iloc[:-1].iterrows()]
         with open(file, 'wb') as f:
             pickle.dump(history, f)
     return history
 
 def showall():
-    for data in TrainingDataModel2.select():
-        print(data.created_at,data.res_coeffs_0,data.res_coeffs_1,data.sup_coeffs_0,data.sup_coeffs_1,data.price_coeffs_0,data.price_coeffs_1,data.price_coeffs_2,data.long, data.short, data.wait,data.if_trained),
+    for data in TrainingDataModel.select():
+        print(data.created_at,data.res_coeffs_0,data.res_coeffs_1,data.sup_coeffs_0,data.sup_coeffs_1,data.price_coeffs_0,data.price_coeffs_1,data.price_coeffs_2,data.long, data.short, data.wait,data.if_trained, data.timestamp),
 
 if(__name__=='__main__'):
     history = get_history()
@@ -86,8 +62,10 @@ if(__name__=='__main__'):
                     res_coeffs  = params['res_coeffs']
                     sup_coeffs  = params['sup_coeffs']
                     price_coeffs  = params['price_coeffs']
-                    td = TrainingDataModel2(res_coeffs_0 = res_coeffs[0],
-            res_coeffs_1=res_coeffs[1], sup_coeffs_0 = sup_coeffs[0],sup_coeffs_1=sup_coeffs[1], price_coeffs_0 = price_coeffs[0], price_coeffs_1 = price_coeffs[1], price_coeffs_2 = price_coeffs[2], long=1 if direction==1 else 0, short=1 if direction == -1 else 0, wait = 1 if direction ==0 else 0)
+                    # import pdb
+                    # pdb.set_trace()
+                    td = TrainingDataModel(res_coeffs_0 = res_coeffs[0],
+            res_coeffs_1=res_coeffs[1], sup_coeffs_0 = sup_coeffs[0],sup_coeffs_1=sup_coeffs[1], price_coeffs_0 = price_coeffs[0], price_coeffs_1 = price_coeffs[1], price_coeffs_2 = price_coeffs[2], long=1 if direction==1 else 0, short=1 if direction == -1 else 0, wait = 1 if direction ==0 else 0, timestamp=history[offset+1]['timestamp'])
                     td.save()
             ifloadanother = input('load another y?')
             if(ifloadanother == 'y'):

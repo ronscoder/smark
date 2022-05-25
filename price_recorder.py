@@ -25,7 +25,7 @@ class OHLC:
             self.dt = now
             self.high = self.low = self.open = self.close = ltp
         else:
-            if(now > self.dt + datetime.timedelta(minutes=self.interval) and now.time() >= datetime.time(hour=9, minute=15)):
+            if(now > self.dt + datetime.timedelta(minutes=self.interval) and datetime.time(hour=9, minute=15)<now.time()<datetime.time(hour=3, minute=30)):
                 self.history.append({
                     'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close, 'timestamp': self.dt})
                 self.dt = None
@@ -49,12 +49,11 @@ class DayHistories:
                 )
                 today = datetime.datetime.today().date()
                 print('downloading historical for ', ysymbol)
-                ydata = ydownload(ysymbol, startdate=f'{last_working_day.year}-{last_working_day.month:02}-{last_working_day.day:02}',
-                                    enddate=f'{today.year}-{today.month:02}-{today.day+1:02}', interval='5m')
+                ydata = ydownload(ysymbol, startdate=last_working_day,
+                                    enddate=today, interval='5m')
                 self.day_histories[token].history = [{'open': ohlc['Open'], 'high': ohlc['High'], 'low': ohlc['Low'],
-                                                        'close': ohlc['Close']} for r, ohlc in ydata.iterrows()]
+                                                        'close': ohlc['Close'], 'timestamp': r.to_pydatetime()} for r, ohlc in ydata.iterrows()]
                 p1.publish(f'HISTORY_{token}', self.day_histories[token].history)
-
     def record(self, channel, data):
         # print(channel, data)
         token = data['instrument_token']

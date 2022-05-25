@@ -5,7 +5,7 @@ import os
 
 
 # from peewee import *
-from training_data import TrainingDataModel2
+from dbmodel import TrainingDataModel
 if(__name__=='__main__'):
     while(True):
         if(os.path.exists('./data/NNModel2')):
@@ -18,8 +18,8 @@ if(__name__=='__main__'):
             # output, long, short, wait 
         X = []
         y = []
-        # query = TrainingDataModel2.select().where(TrainingDataModel2.if_trained==False)
-        query = TrainingDataModel2.select()
+        # query = TrainingDataModel.select().where(TrainingDataModel.if_trained==False)
+        query = TrainingDataModel.select()
         for rec in query:
             X.append([rec.res_coeffs_0, rec.res_coeffs_1, rec.sup_coeffs_0, rec.sup_coeffs_1, rec.price_coeffs_0, rec.price_coeffs_1, rec.price_coeffs_2])
             # y = [[rec.long, rec.short, rec.wait]]

@@ -1,14 +1,14 @@
 import os
 import torch
 
-from training_data import TrainingDataModel2
+from dbmodel import TrainingDataModel
 
 if(os.path.exists('./data/NNModel2')):
     print('loading model')
     model = torch.load('./data/NNModel2')
     correct = 0
     wrong = 0
-    for r in TrainingDataModel2.select():
+    for r in TrainingDataModel.select():
         x = torch.tensor([r.res_coeffs_0, r.res_coeffs_1, r.sup_coeffs_0, r.sup_coeffs_1, r.price_coeffs_0, r.price_coeffs_1,r.price_coeffs_2], dtype=torch.float)
         model.train(mode=False)
         res = model(x)

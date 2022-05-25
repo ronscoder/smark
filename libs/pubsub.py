@@ -2,6 +2,8 @@ import redis
 import pickle
 import os
 
+from libs.configs import getConfig
+
 def get_ps_1(pname):
     'For dynamic/runtime data'
     return PubSub(pname)
@@ -23,7 +25,8 @@ class PubSub:
         if('ON_HEROKU' in os.environ):
             self.r = redis.from_url(os.environ['REDIS_URL'], db=db)
         else:
-            self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-34-202-133-28.compute-1.amazonaws.com:15709', db=db)
+            # self.r = redis.from_url('redis://:p596aaa24282fad72077b4cbfab080dc32179ba0d400919f6800c85663c06bcdf@ec2-34-202-133-28.compute-1.amazonaws.com:15709', db=db)
+            self.r = redis.from_url(getConfig('REDIS_URL'), db=db)
         self.ps = self.r.pubsub()
         print('redis client', pname)
         print('redis client count', len(self.r.client_list()))
