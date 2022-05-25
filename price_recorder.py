@@ -26,7 +26,7 @@ class OHLC:
             self.dt = now
             self.high = self.low = self.open = self.close = ltp
         else:
-            if(now > self.dt + datetime.timedelta(minutes=self.interval) and datetime.time(hour=9, minute=15)<now.time()<datetime.time(hour=3, minute=30)):
+            if(now > self.dt + datetime.timedelta(minutes=self.interval) and datetime.time(hour=9, minute=15)<now.time()<datetime.time(hour=15, minute=30)):
                 self.history.append({
                     'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close, 'timestamp': self.dt})
                 self.dt = None
