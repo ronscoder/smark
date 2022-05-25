@@ -30,7 +30,7 @@ class OHLC:
                 self.history.append({
                     'open': self.open, 'high': self.high, 'low': self.low, 'close': self.close, 'timestamp': self.dt})
                 self.dt = None
-                print('publishing history', dt)
+                print('publishing history', self.dt)
                 p1.publish(f'HISTORY_{self.token}', self.history)
             else:
                 self.high = max([self.high, ltp])
