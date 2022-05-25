@@ -41,7 +41,7 @@ def getgraph(symbol):
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
         direction, params = _calculate(histohlcs_offset)
-        print('direction', direction, 'std', params['std'])
+        print('direction',direction, params)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
@@ -85,32 +85,32 @@ def getgraph(symbol):
 
         # fig.add_shape(type='line', x0=len(histohlcs_offset)-3, x1=len(histohlcs_offset)-3+2, y0=p_move2(0),  y1=p_move2(2), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
 
-        extremas = params['extremas']
+        # extremas = params['extremas']
         # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
         # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
         # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1][-3:-1]
         # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1][-3:-1]        
 
-        maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
-        maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
-        minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
-        minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
+        # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
+        # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
+        # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
+        # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
 
-        p_res = params['p_res']
-        std = params['std']
-        # print('std', std)
-        if(p_res is not None):
-            fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
+        # p_res = params['p_res']
+        # std = params['std']
+        # # print('std', std)
+        # if(p_res is not None):
+        #     fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
 
-            fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
 
-            fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=labels[maximas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='solid'), row=1, col=1)
 
-        p_sup = params['p_sup']
-        if(p_sup is not None):
-            fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
+        # p_sup = params['p_sup']
+        # if(p_sup is not None):
+        #     fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
+        #     fig.add_shape(type='line', x0=labels[minimas_x[0]], x1=labels[len(histohlcs_offset)-1], y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='solid'), row=1, col=1)
 
         if(True):
             l = len(histohlcs_offset) - 1
@@ -122,18 +122,18 @@ def getgraph(symbol):
             if(direction ==-1):
                 fig.add_vline(x=labels[l], line=dict(color='red', width=2, dash='solid'), row=1, col=1)
                 
-            if(extremas is not None):
-                # print('extremas')
-                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x[0]==-1]
-                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x[0]==1]
-                for i,v in maximas:
-                    fig.add_shape(type='line', x0=labels[i-1], x1=labels[i+1], y0=v+50,
-                        y1=v+50, line=dict(color='purple', width=10), row=1, col=1)
-                    # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
-                    #     y1=v+50, line=dict(color='purple', width=10), row=2, col=1)
-                for i,v in minimas:
-                    fig.add_shape(type='line', x0=labels[i-1], x1=labels[i+1], y0=v-50,
-                        y1=v-50, line=dict(color='blue', width=10), row=1, col=1)
+            # if(extremas is not None):
+            #     # print('extremas')
+            #     maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x[0]==-1]
+            #     minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x[0]==1]
+            #     for i,v in maximas:
+            #         fig.add_shape(type='line', x0=labels[i-1], x1=labels[i+1], y0=v+50,
+            #             y1=v+50, line=dict(color='purple', width=10), row=1, col=1)
+            #         # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
+            #         #     y1=v+50, line=dict(color='purple', width=10), row=2, col=1)
+            #     for i,v in minimas:
+            #         fig.add_shape(type='line', x0=labels[i-1], x1=labels[i+1], y0=v-50,
+            #             y1=v-50, line=dict(color='blue', width=10), row=1, col=1)
                     # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
                     #     y1=v-50, line=dict(color='blue', width=10), row=2, col=1)
             # if(ys is not None):
