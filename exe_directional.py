@@ -33,10 +33,10 @@ class Action:
             return
         option = None
         inst = None
-        if(direction == 1):    
-            inst, _ = set_options(if_ce=False, if_pe=True)
-        elif(direction == -1):
-            _, inst = set_options(if_ce=True, if_pe=False)
+        if(direction == -1):    
+            inst, _ = set_options(if_ce=True, if_pe=False)
+        elif(direction == 1):
+            _, inst = set_options(if_ce=False, if_pe=True)
 
         if(not inst is None):
             option = inst[0]
