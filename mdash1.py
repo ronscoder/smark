@@ -47,7 +47,7 @@ def getgraph(symbol):
         highs = [x['high'] for x in histohlcs]
         lows = [x['low'] for x in histohlcs]
         labels = [x['timestamp'] for x in histohlcs]
-        print(histohlcs[-1])
+        # print(histohlcs[-1])
         # fig.add_trace(go.Candlestick(
         #     x=list(range(len(histohlcs))), open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
         fig.add_trace(go.Candlestick(

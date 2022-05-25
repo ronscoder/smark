@@ -109,7 +109,7 @@ def _calculate(data):
     # extrema_offset_factor = configs['EXTREMA_OFFSET_FACTOR']
     # sd_bdfactor = configs['SD_BDFACTOR']
     # sd_calcoffset_factor = configs['SD_CALC_OFFSET_FACTOR']
-    closes = [d['close'] for d in data[:-extrema_window]]
+    closes = [d['close'] for d in data[-extrema_window:]]
     
 
     params = {}

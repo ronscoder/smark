@@ -4,7 +4,8 @@ import datetime
 def ydownload(symbol, startdate, enddate=None, interval='5m'):
     if(enddate==None):
         enddate = datetime.datetime.today().date()
-    return yf.download(symbol, start=f'{startdate.year}-{startdate.month:02}-{startdate.day:02}', end=f'{enddate.year}-{enddate.month:02}-{enddate.day+1:02}', interval=interval)
+    nextdate = enddate + datetime.timedelta(days=1)
+    return yf.download(symbol, start=f'{startdate.year}-{startdate.month:02}-{startdate.day:02}', end=f'{nextdate.year}-{nextdate.month:02}-{nextdate.day+1:02}', interval=interval)
 
 def is_holiday(date: datetime.date):
     day = date.weekday()
