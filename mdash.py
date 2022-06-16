@@ -10,7 +10,7 @@ import plotly.express as px
 # from direction import get_extremas
 import pickle
 import os
-from direction import _calculate, get_training_data
+from direction import _calculate, get_training_data, boundary_overshoot
 import numpy as np
 
 # r = r3 = get_ps_1('mdash')
@@ -19,11 +19,6 @@ app = dash.Dash(__name__, title='MDashAoVs')
 symbols = [['NIFTY BANK', 260105, '^NSEBANK', 'INDEX'],]
 instruments = [{'symbol': x[0], 'token': x[1], 'ysymbol': x[2], 'type': x[3]}
                    for x in symbols]
-
-# configs = getConfigs()
-# freqfact = configs['FREQ_CUTOFF_FACTOR']
-# order = configs['EXTREMA_ORDER']
-
 def getgraph(symbol):
     fig = make_subplots(rows=1, cols=1, shared_yaxes=True)
     histohlcs = None
@@ -40,114 +35,58 @@ def getgraph(symbol):
     
     divs = []
     if(not (None in (histohlcs, histohlcs_offset))):
-        direction, params = _calculate(histohlcs_offset)
-        print('direction', direction, 'std', params['std'])
+        direction, params = boundary_overshoot(histohlcs_offset)
+        print('direction', direction, params)
         opens = [x['open'] for x in histohlcs]
         closes = [x['close'] for x in histohlcs]
         highs = [x['high'] for x in histohlcs]
         lows = [x['low'] for x in histohlcs]
         # labels = [x['timestamp'] for x in histohlcs]
-        print(histohlcs[-1])
+        # print(histohlcs[-1])
+        # print(labels)
         fig.add_trace(go.Candlestick(
             x=list(range(len(histohlcs))), open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
-        # fig.add_trace(go.Candlestick(
-        #     x=labels, open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
-        # fig.add_trace(go.Candlestick(
-        #     x=[v['timestamp'] for v in histohlcs], open=opens, high=highs, low=lows, close=closes, name='history'), row=1, col=1)
-        
+
         fig.add_vline(x=len(histohlcs_offset)-1, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
 
-        opens = [x['open'] for x in histohlcs_offset]
-        closes = [x['close'] for x in histohlcs_offset]
-        highs = [x['high'] for x in histohlcs_offset]
-        lows = [x['low'] for x in histohlcs_offset]
+        top = params['top']
+        bottom = params['bottom']
+        boundary_window_size = params['boundary_window_size']
+        boundary_pc = params['boundary_pc']
+        cboundary_pc = ((top - bottom)/bottom)*100
+        mtop = (top*(1+(boundary_pc/100)/2))
+        mbot = (bottom*(1-(boundary_pc/100)/2))
         
-        # x1 = len(histohlcs_offset) - 2*5 - 1
-        # x2 = len(histohlcs_offset)
-        # xlist = [x for x in range(x1,x2)]
-        # p_price_shape = np.poly1d(np.polyfit(xlist, closes[x1:x2], 2))
-        # print(p_price_shape.c)
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-2*boundary_window_size, x1=len(histohlcs_offset)+2*boundary_window_size, y0=top,  y1=top, line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
 
-        # tparams = get_training_data(histohlcs_offset)
-        # price_coeffs = tparams['price_coeffs']
-        # p_price_shape1 = np.poly1d(price_coeffs)
-        # extrema_offset_factor = 3
-        # extrema_window = 5
-        # x1 = len(histohlcs_offset) - extrema_offset_factor*extrema_window - 1
-        # x2 = len(histohlcs_offset)
-        # xlist = [x for x in range(x1,x2)]
-        # fig.add_trace(go.Scatter(x=xlist, y=[p_price_shape1(x)-100 for x in range(x1,x2)], 
-        # line=dict(color='green', width=1, dash='solid'), mode='lines'), row=1, col=1)
-        # p_move1 = np.poly1d(np.polyfit([x for x in range(3)], closes[-5:-2], 1))
-        # p_move2 = np.poly1d(np.polyfit([x for x in range(3)], closes[-3:], 1))
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-2*boundary_window_size, x1=len(histohlcs_offset)+2*boundary_window_size, y0=bottom,  y1=bottom, line=dict(color='green', width=2, dash='solid'), row=1, col=1)
 
-        # fig.add_shape(type='line', x0=len(histohlcs_offset)-5, x1=len(histohlcs_offset)-5+2, y0=p_move1(0),  y1=p_move1(2), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-2*boundary_window_size, x1=len(histohlcs_offset)+2*boundary_window_size, y0=mtop,  y1=mtop, line=dict(color='orange', width=2, dash='dot'), row=1, col=1)
 
-        # fig.add_shape(type='line', x0=len(histohlcs_offset)-3, x1=len(histohlcs_offset)-3+2, y0=p_move2(0),  y1=p_move2(2), line=dict(color='orange', width=3, dash='solid'), row=1, col=1)
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-2*boundary_window_size, x1=len(histohlcs_offset)+2*boundary_window_size, y0=mbot,  y1=mbot, line=dict(color='green', width=2, dash='dot'), row=1, col=1)
 
-        extremas = params['extremas']
-        # maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
-        # maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1][-3:-1]
-        # minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1][-3:-1]
-        # minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1][-3:-1]        
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-boundary_window_size-2, x1=len(histohlcs_offset)-boundary_window_size-2, y0=top+100,  y1=bottom-100, line=dict(color='green', width=1, dash='solid'), row=1, col=1)
 
-        maximas_y = [x[1] for i,x in enumerate(extremas) if x[0] == -1]
-        maximas_x = [i for i,x in enumerate(extremas) if x[0] == -1]
-        minimas_y = [x[1] for i,x in enumerate(extremas) if x[0] == 1]
-        minimas_x = [i for i,x in enumerate(extremas) if x[0] == 1]
-
-        p_res = params['p_res']
-        std = params['std']
-        # print('std', std)
-        if(p_res is not None):
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0]),  y1=p_res(len(histohlcs_offset)-1), line=dict(color='orange', width=2, dash='solid'), row=1, col=1)
-
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])+std,  y1=p_res(len(histohlcs_offset)-1)+std, line=dict(color='orange', width=1, dash='dot'), row=1, col=1)
-
-            fig.add_shape(type='line', x0=maximas_x[0], x1=len(histohlcs_offset)-1, y0=p_res(maximas_x[0])-std,  y1=p_res(len(histohlcs_offset)-1)-std, line=dict(color='orange', width=1, dash='dot'), row=1, col=1)
-
-        p_sup = params['p_sup']
-        if(p_sup is not None):
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0]),  y1=p_sup(len(histohlcs_offset)-1), line=dict(color='red', width=2, dash='solid'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])+std,  y1=p_sup(len(histohlcs_offset)-1)+std, line=dict(color='red', width=1, dash='dot'), row=1, col=1)
-            fig.add_shape(type='line', x0=minimas_x[0], x1=len(histohlcs_offset)-1, y0=p_sup(minimas_x[0])-std,  y1=p_sup(len(histohlcs_offset)-1)-std, line=dict(color='red', width=1, dash='dot'), row=1, col=1)
-
+        fig.add_shape(type='line', x0=len(histohlcs_offset)-2, x1=len(histohlcs_offset)-2, y0=top+100,  y1=bottom-100, line=dict(color='green', width=1, dash='solid'), row=1, col=1)
+        
         if(True):
             l = len(histohlcs_offset) - 1
             if(direction ==1):
-                # fig.add_shape(type='line', x0=l, x1=l, y0=max(highs)+50,
-                #         y1=max(highs) - (max(highs) - min(lows))/2, line=dict(color='green', width=2, dash='solid'), row=1, col=1)
                 fig.add_vline(x = l,  line=dict(color='green', width=2, dash='solid'), row=1, col=1)
-            
             if(direction ==-1):
                 fig.add_vline(x=l, line=dict(color='red', width=2, dash='solid'), row=1, col=1)
                 
-            if(extremas is not None):
-                # print('extremas')
-                maximas = [(i, highs[i]) for i,x in enumerate(extremas) if x[0]==-1]
-                minimas = [(i, lows[i]) for i,x in enumerate(extremas) if x[0]==1]
-                for i,v in maximas:
-                    fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
-                        y1=v+50, line=dict(color='purple', width=10), row=1, col=1)
-                    # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v+50,
-                    #     y1=v+50, line=dict(color='purple', width=10), row=2, col=1)
-                for i,v in minimas:
-                    fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
-                        y1=v-50, line=dict(color='blue', width=10), row=1, col=1)
-                    # fig.add_shape(type='line', x0=i-1, x1=i+1, y0=v-50,
-                    #     y1=v-50, line=dict(color='blue', width=10), row=2, col=1)
-            # if(ys is not None):
-            #     fig.add_trace(go.Scatter(y=[h['close'] for h in histohlcs]), row=1, col=1)
-                # fig.add_trace(go.Scatter(y=ys), row=2, col=1)
-        # fig.add_trace(go.Scatter(x=[i for i,x in extremasv], y=[x for i,x in extremasv], mode="markers"))
-        # for i, extrema in enumerate(extremas):
-        #     if(extrema == 1):
-        #         'maxima'
-        #         fig.add_shape(type='circle', x0=i, x1=i, y0=last_price,
-        #               y1=last_price, line=dict(color='blue', width=1, dash='dot'), row=1, col=1)
 
     fig.update_layout(title_text=symbol)
-    # fig.update_xaxes(range=[0, 80])
+    # fig.update_xaxes(
+    #     rangeslider_visible=True,
+    #     rangebreaks=[
+    #         # NOTE: Below values are bound (not single values), ie. hide x to y
+    #         dict(bounds=["sat", "mon"]),  # hide weekends, eg. hide sat to before mon
+    #         dict(bounds=[15.5, 9.5], pattern="hour"),  # hide hours outside of 9.30am-4pm
+    #         # dict(values=["2020-12-25", "2021-01-01"])  # hide holidays (Christmas and New Year's, etc)
+    #     ]
+    # )
     return html.Div([dcc.Graph(id='graph1', figure=fig),
                      *divs
                      ])

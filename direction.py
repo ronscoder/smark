@@ -2,7 +2,7 @@
 import enum
 from libs.pubsub import PubSub, get_ps_1
 from libs.tools import mva
-from libs.configs import getConfigs
+from libs.configs import getConfig, getConfigs
 import datetime
 from zoneinfo import ZoneInfo
 import numpy as np
@@ -294,6 +294,43 @@ def _calculate2(data):
                 print('downtrend, resistance breakdown')
 
     return direction, params
+
+def boundary_overshoot(data):
+    '''
+    Make boundary box. 
+    1. Assume the price wants to bounce within the boundary. 
+    2. Sometimes the price bounces beyond the boundary.
+    '''
+    boundary_window_size = getConfig('EXTREMA_WINDOW')
+    boundary_pc = getConfig('CANDLE_MOMENTUM_PC')
+    cdata = data[-(boundary_window_size+1):-1]
+    ccloses = [d['close'] for d in cdata]
+    copens = [d['open'] for d in cdata]
+    
+    ltp = data[-1]['close']
+
+    top = max([*ccloses, *copens])
+    bottom = min([*ccloses, *copens])
+    
+    # minimum boundary gap
+    cboundary_pc = ((top - bottom)/bottom)*100
+
+    params = {'top': top, 'bottom': bottom, 'boundary_window_size': boundary_window_size, 'boundary_pc':boundary_pc, 'cboundary_pc': cboundary_pc}
+
+    if(cboundary_pc < boundary_pc):
+        # print('minimum boundary gap not met', cboundary_pc)
+        return 0, params
+    
+    #conditions for direction = 1
+    if(ltp > (top*(1+(boundary_pc/100)/2))):
+        return 1, params
+    #conditions for direction = 1
+    if(ltp < (bottom*(1-(boundary_pc/100)/2))):
+        return -1, params
+
+    return 0, params
+    
+
 
 def calculate(channel, data, ps1: PubSub):    
     print('calc...')

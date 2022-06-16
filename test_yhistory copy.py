@@ -37,11 +37,12 @@ if(not history is None):
         pickle.dump(history, f)
     while(True):
         print(history[-1])
-        offset = input('upto: ')
-        if(offset == ''):
+        datestr = input('upto hhmm: ')
+        if(datestr == ''):
             data = history
         else:
-            offset = int(offset)
+            dt = datetime(year=2022,month=int(mmdd[:2]), day=int(mmdd[2:]), hour=int(datestr[:2]), minute=int(datestr[2:]), tzinfo=ZoneInfo('Asia/Kolkata'))  
+            offset = [x['timestamp'] for x in history].index(dt)
             data = history[:offset+1]
         with open('sample/history', 'wb') as f:
             pickle.dump(history, f)

@@ -33,9 +33,9 @@ class Action:
             return
         option = None
         inst = None
-        if(direction == 1):    
+        if(direction == -1):    
             inst, _ = set_options(if_ce=True, if_pe=False)
-        elif(direction == -1):
+        elif(direction == 1):
             _, inst = set_options(if_ce=False, if_pe=True)
 
         if(not inst is None):
@@ -76,7 +76,7 @@ class Action:
             if(len(obuyorders)>0):
                 for order in obuyorders:
                     position_direction = 1 if order['tradingsymbol'][-2:] == 'CE' else -1
-                    if(position_direction != direction):
+                    if(position_direction == direction):
                     #exit reversal
                         self.orderapi.cancel_open_buy_orders([order])
                     else:
